@@ -14,15 +14,16 @@ Send an SMS from GitHub Actions.
 2. Add the following to your workflow
 
 ```yml
-uses: twilio-labs/actions-sms
-with:
-  fromPhoneNumber: '+1(234)5678901'
-  toPhoneNumber: '+1(234)3334444'
-  message: 'Hello from Twilio'
-env:
-  TWILIO_ACCOUNT_SID: ${{ secrets.TWILIO_ACCOUNT_SID }}
-  TWILIO_API_KEY: ${{ secrets.TWILIO_API_KEY }}
-  TWILIO_AUTH_TOKEN: ${{ secrets.TWILIO_API_SECRET }}
+- name: 'Sending SMS Notification'
+  uses: twilio-labs/actions-sms@v1
+  with:
+    fromPhoneNumber: '+1(234)5678901'
+    toPhoneNumber: '+1(234)3334444'
+    message: 'Hello from Twilio'
+  env:
+    TWILIO_ACCOUNT_SID: ${{ secrets.TWILIO_ACCOUNT_SID }}
+    TWILIO_API_KEY: ${{ secrets.TWILIO_API_KEY }}
+    TWILIO_AUTH_TOKEN: ${{ secrets.TWILIO_API_SECRET }}
 ```
 
 ## Inputs
