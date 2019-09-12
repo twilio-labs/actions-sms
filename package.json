@@ -2,7 +2,7 @@
   "name": "@twilio-labs/actions-sms",
   "version": "1.0.0",
   "description": "Send an SMS through GitHub Actions",
-  "main": "dist/main.js",
+  "main": "dist/index.js",
   "scripts": {
     "build": "ncc build main.js",
     "test": "echo \"Error: no test specified\" && exit 0"
