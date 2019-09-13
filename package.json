@@ -26,5 +26,13 @@
     "@actions/core": "^1.1.0",
     "twilio": "^3.34.0"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "husky": "^3.0.5"
+  },
+  "husky": {
+    "skipCI": true,
+    "hooks": {
+      "post-commit": "npm prune --production && git add node_modules/* && git commit -m \"chore: update node_modules\""
+    }
+  }
 }
