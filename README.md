@@ -59,6 +59,16 @@ A Twilio API Secret. Can alternatively be stored in environment'
 
 The SID of the [message resource](https://www.twilio.com/docs/sms/api/message-resource#message-properties) associated with the SMS sent.
 
+## Contributing
+
+## Third Party Licenses
+
+This GitHub Action uses a couple of Node.js modules to work.
+
+License and other copyright information for each module is included in the release branch of each action version under `node_modules/{module}`.
+
+More information for each package can be found at `https://www.npmjs.com/package/{package}`
+
 ## License
 
 MIT
