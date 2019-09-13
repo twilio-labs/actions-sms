@@ -5,11 +5,11 @@ Send an SMS from GitHub Actions.
 ## Prerequisites
 
 - A Twilio Account. [Sign up for free](https://www.twilio.com/try-twilio)
-- A pair of [Twilio API Key and Secret](https://www.twilio.com/docs/iam/keys/api-key)
+- A [Twilio API Key and Secret](https://www.twilio.com/docs/iam/keys/api-key)
 
 ## Usage
 
-1. Set up your credentials as secrets in your repository settings using `TWILIO_ACCOUNT_SID`, `TWILIO_API_KEY`, `TWILIO_AUTH_TOKEN`
+1. Set up your credentials as secrets in your repository settings using `TWILIO_ACCOUNT_SID`, `TWILIO_API_KEY`, `TWILIO_API_SECRET`
 
 2. Add the following to your workflow
 
@@ -23,7 +23,7 @@ Send an SMS from GitHub Actions.
   env:
     TWILIO_ACCOUNT_SID: ${{ secrets.TWILIO_ACCOUNT_SID }}
     TWILIO_API_KEY: ${{ secrets.TWILIO_API_KEY }}
-    TWILIO_AUTH_TOKEN: ${{ secrets.TWILIO_API_SECRET }}
+    TWILIO_API_SECRET: ${{ secrets.TWILIO_API_SECRET }}
 ```
 
 ## Inputs
