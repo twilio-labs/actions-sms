@@ -15,7 +15,7 @@ Send an SMS from GitHub Actions.
 
 ```yml
 - name: 'Sending SMS Notification'
-  uses: twilio-labs/actions-sms@v1-alpha
+  uses: twilio-labs/actions-sms@v1
   with:
     fromPhoneNumber: '+1(234)5678901'
     toPhoneNumber: '+1(234)3334444'
