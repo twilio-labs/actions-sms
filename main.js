@@ -12,18 +12,19 @@ async function run() {
   const apiSecret =
     core.getInput('TWILIO_API_SECRET') || process.env.TWILIO_API_SECRET;
 
-  console.log('Sending SMS');
+  core.debug('Sending SMS');
   const client = twilio(apiKey, apiSecret, { accountSid: accountSid });
   const { sid } = await client.messages.create({
     from: fromPhoneNumber,
     to: toPhoneNumber,
     body: message,
   });
-  console.log('SMS sent!');
+  core.debug('SMS sent!');
 
   core.setOutput('messageSid', sid);
 }
 
 run().catch(err => {
+  core.error('Failed to send message', err.message)
   core.setFailed(err.message);
 });
