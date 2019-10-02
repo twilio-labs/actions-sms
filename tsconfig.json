@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "module": "commonjs",
-    "outDir": "./built",
+    "outDir": "./dist",
     "target": "es2018",
     "strict": true,
     "strictNullChecks": true,
@@ -9,6 +9,6 @@
     "moduleResolution": "node"
   },
   "include": [
-    "./*"
+    "./src/**/*"
   ]
 }
