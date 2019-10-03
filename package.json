@@ -4,6 +4,7 @@
   "description": "Send an SMS through GitHub Actions",
   "main": "dist/main.js",
   "scripts": {
+    "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 0"
   },
   "repository": {
@@ -27,7 +28,8 @@
     "twilio": "^3.34.0"
   },
   "devDependencies": {
-    "husky": "^3.0.5"
+    "husky": "^3.0.5",
+    "typescript": "^3.6.3"
   },
   "husky": {
     "skipCI": true,
