@@ -1,6 +1,6 @@
 const core = require("@actions/core");
 const twilio = require("twilio");
-const run = require("./main.js");
+const run = require("./dist/main.js");
 
 jest.mock("@actions/core");
 jest.mock("twilio");

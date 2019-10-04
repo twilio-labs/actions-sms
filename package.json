@@ -2,8 +2,9 @@
   "name": "@twilio-labs/actions-sms",
   "version": "1.0.0",
   "description": "Send an SMS through GitHub Actions",
-  "main": "main.js",
+  "main": "dist/main.js",
   "scripts": {
+    "build": "tsc",
     "test": "jest"
   },
   "repository": {
@@ -28,7 +29,8 @@
   },
   "devDependencies": {
     "husky": "^3.0.5",
-    "jest": "^24.9.0"
+    "jest": "^24.9.0",
+    "typescript": "^3.6.3"
   },
   "husky": {
     "skipCI": true,

@@ -26,7 +26,7 @@ async function run() {
 
 function execute() {
   run().catch(err => {
-    core.error('Failed to send message', err.message)
+    core.error('Failed to send message', err.message);
     core.setFailed(err.message);
   });
 }
