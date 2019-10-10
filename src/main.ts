@@ -2,8 +2,8 @@ const core = require('@actions/core');
 const twilio = require('twilio');
 
 async function run() {
-  const fromPhoneNumber = core.getInput('fromPhoneNumber');
-  const toPhoneNumber = core.getInput('toPhoneNumber');
+  const from = core.getInput('fromPhoneNumber');
+  const to = core.getInput('toPhoneNumber');
   const message = core.getInput('message');
 
   const accountSid =
@@ -13,10 +13,10 @@ async function run() {
     core.getInput('TWILIO_API_SECRET') || process.env.TWILIO_API_SECRET;
 
   core.debug('Sending SMS');
-  const client = twilio(apiKey, apiSecret, { accountSid: accountSid });
+  const client = twilio(apiKey, apiSecret, { accountSid });
   const { sid } = await client.messages.create({
-    from: fromPhoneNumber,
-    to: toPhoneNumber,
+    from,
+    to,
     body: message,
   });
   core.debug('SMS sent!');
@@ -25,9 +25,9 @@ async function run() {
 }
 
 function execute() {
-  run().catch(err => {
-    core.error('Failed to send message', err.message);
-    core.setFailed(err.message);
+  run().catch(({ message }) => {
+    core.error('Failed to send message', message);
+    core.setFailed(message);
   });
 }
 
