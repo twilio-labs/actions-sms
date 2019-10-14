@@ -23,20 +23,15 @@ test("Log failures", async () => {
   );
 });
 
-test("Output message sid", async () => {
+test("Returns message sid", async () => {
   const sid = "ID123";
 
   twilio.mockReturnValue({
     messages: {
-      create: () => {
-        return { sid };
-      }
+      create: () => ({ sid })
     }
   });
 
-  await run();
-
-  expect(core.setOutput.mock.calls).toEqual(
-    expect.arrayContaining([["messageSid", sid]])
-  );
+  const { sid: resultSid } = await run();
+  expect(resultSid).toEqual(sid);
 });
