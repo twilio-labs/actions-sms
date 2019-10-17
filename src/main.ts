@@ -14,21 +14,25 @@ async function run() {
 
   core.debug('Sending SMS');
   const client = twilio(apiKey, apiSecret, { accountSid });
-  const { sid } = await client.messages.create({
+  const resultMessage = await client.messages.create({
     from,
     to,
     body: message,
   });
   core.debug('SMS sent!');
 
-  core.setOutput('messageSid', sid);
+  core.setOutput('messageSid', resultMessage.sid);
+
+  return resultMessage;
 }
 
-function execute() {
-  run().catch(({ message }) => {
+async function execute() {
+  try {
+    return await run();
+  } catch({ message }) {
     core.error('Failed to send message', message);
     core.setFailed(message);
-  });
+  }
 }
 
 module.exports = execute;
