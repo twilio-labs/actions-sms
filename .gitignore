@@ -58,3 +58,6 @@ typings/
 
 # next.js build output
 .next
+
+# Node.js modules downloaded/compiled by npm
+node_modules/
