@@ -65,7 +65,7 @@ The SID of the [message resource](https://www.twilio.com/docs/sms/api/message-re
 
 This GitHub Action uses a couple of Node.js modules to work.
 
-License and other copyright information for each module is included in the release branch of each action version under `node_modules/{module}`.
+License and other copyright information for each module are included in the release branch of each action version under `node_modules/{module}`.
 
 More information for each package can be found at `https://www.npmjs.com/package/{package}`
 
