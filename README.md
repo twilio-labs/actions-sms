@@ -35,7 +35,6 @@ Send an SMS from GitHub Actions.
 ### `toPhoneNumber`
 
 **Required** Phone number to send the SMS to
-required: true
 
 ### `message`
 
@@ -43,15 +42,15 @@ required: true
 
 ### `TWILIO_ACCOUNT_SID`
 
-A Twilio Account SID. Can alternatively be stored in environment'
+A Twilio Account SID. Can alternatively be stored in environment
 
 ### `TWILIO_API_KEY`
 
-A Twilio API Key. Can alternatively be stored in environment'
+A Twilio API Key. Can alternatively be stored in environment
 
 ### `TWILIO_API_SECRET`
 
-A Twilio API Secret. Can alternatively be stored in environment'
+A Twilio API Secret. Can alternatively be stored in environment
 
 ## Outputs
 
