@@ -22,5 +22,6 @@ jobs:
       run: |
         git config --global user.name "GitHub Actions"
         git add dist/
+        git add node_modules/
         git commit -m "chore: Update dist" || echo "No changes to commit"
         git push origin HEAD:master
