@@ -17,7 +17,7 @@ jobs:
     - name: Package
       run: |
         npm ci
-        npm run build && jest
+        npm run test
     - name: Commit
       run: |
         git config --global user.name "GitHub Actions"
