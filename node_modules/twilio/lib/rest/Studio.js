@@ -12,6 +12,7 @@
 var _ = require('lodash');  /* jshint ignore:line */
 var Domain = require('../base/Domain');  /* jshint ignore:line */
 var V1 = require('./studio/V1');  /* jshint ignore:line */
+var V2 = require('./studio/V2');  /* jshint ignore:line */
 
 
 /* jshint ignore:start */
@@ -21,7 +22,10 @@ var V1 = require('./studio/V1');  /* jshint ignore:line */
  * @constructor Twilio.Studio
  *
  * @property {Twilio.Studio.V1} v1 - v1 version
- * @property {Twilio.Studio.V1.FlowList} flows - flows resource
+ * @property {Twilio.Studio.V2} v2 - v2 version
+ * @property {Twilio.Studio.V2.FlowList} flows - flows resource
+ * @property {Twilio.Studio.V2.FlowValidateList} flowValidate -
+ *          flowValidate resource
  *
  * @param {Twilio} twilio - The twilio client
  */
@@ -31,6 +35,7 @@ function Studio(twilio) {
 
   // Versions
   this._v1 = undefined;
+  this._v2 = undefined;
 }
 
 _.extend(Studio.prototype, Domain.prototype);
@@ -38,17 +43,32 @@ Studio.prototype.constructor = Studio;
 
 Object.defineProperty(Studio.prototype,
   'v1', {
-  get: function() {
-    this._v1 = this._v1 || new V1(this);
-    return this._v1;
-  }
+    get: function() {
+      this._v1 = this._v1 || new V1(this);
+      return this._v1;
+    }
+});
+
+Object.defineProperty(Studio.prototype,
+  'v2', {
+    get: function() {
+      this._v2 = this._v2 || new V2(this);
+      return this._v2;
+    }
 });
 
 Object.defineProperty(Studio.prototype,
   'flows', {
-  get: function() {
-    return this.v1.flows;
-  }
+    get: function() {
+      return this.v2.flows;
+    }
+});
+
+Object.defineProperty(Studio.prototype,
+  'flowValidate', {
+    get: function() {
+      return this.v2.flowValidate;
+    }
 });
 
 module.exports = Studio;

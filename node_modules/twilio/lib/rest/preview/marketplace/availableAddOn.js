@@ -305,7 +305,7 @@ AvailableAddOnList = function AvailableAddOnList(version) {
    * @function get
    * @memberof Twilio.Preview.Marketplace.AvailableAddOnList#
    *
-   * @param {string} sid - The unique Available Add-on Sid
+   * @param {string} sid - The SID of the AvailableAddOn resource to fetch
    *
    * @returns {Twilio.Preview.Marketplace.AvailableAddOnContext}
    */
@@ -416,19 +416,20 @@ AvailableAddOnPage.prototype[util.inspect.custom] = function inspect(depth,
  *
  * @constructor Twilio.Preview.Marketplace.AvailableAddOnInstance
  *
- * @property {string} sid - A string that uniquely identifies this Add-on
- * @property {string} friendlyName - A description of this Add-on
- * @property {string} description - A short description of the Add-on functionality
- * @property {string} pricingType -
- *          The way customers are charged for using this Add-on
+ * @property {string} sid - The unique string that identifies the resource
+ * @property {string} friendlyName -
+ *          The string that you assigned to describe the resource
+ * @property {string} description -
+ *          A short description of the Add-on's functionality
+ * @property {string} pricingType - How customers are charged for using this Add-on
  * @property {object} configurationSchema -
- *          The JSON Schema describing the Add-on's configuration
- * @property {string} url - The url
- * @property {string} links - The links
+ *          The JSON object with the configuration that must be provided when installing a given Add-on
+ * @property {string} url - The absolute URL of the resource
+ * @property {string} links - The URLs of related resources
  *
  * @param {Marketplace} version - Version of the resource
  * @param {AvailableAddOnPayload} payload - The instance payload
- * @param {sid} sid - The unique Available Add-on Sid
+ * @param {sid} sid - The SID of the AvailableAddOn resource to fetch
  */
 /* jshint ignore:end */
 AvailableAddOnInstance = function AvailableAddOnInstance(version, payload, sid)
@@ -451,13 +452,13 @@ AvailableAddOnInstance = function AvailableAddOnInstance(version, payload, sid)
 
 Object.defineProperty(AvailableAddOnInstance.prototype,
   '_proxy', {
-  get: function() {
-    if (!this._context) {
-      this._context = new AvailableAddOnContext(this._version, this._solution.sid);
-    }
+    get: function() {
+      if (!this._context) {
+        this._context = new AvailableAddOnContext(this._version, this._solution.sid);
+      }
 
-    return this._context;
-  }
+      return this._context;
+    }
 });
 
 /* jshint ignore:start */
@@ -530,7 +531,7 @@ AvailableAddOnInstance.prototype[util.inspect.custom] = function inspect(depth,
  *          extensions resource
  *
  * @param {Marketplace} version - Version of the resource
- * @param {sid} sid - The unique Available Add-on Sid
+ * @param {sid} sid - The SID of the AvailableAddOn resource to fetch
  */
 /* jshint ignore:end */
 AvailableAddOnContext = function AvailableAddOnContext(version, sid) {
@@ -577,12 +578,12 @@ AvailableAddOnContext.prototype.fetch = function fetch(callback) {
 
 Object.defineProperty(AvailableAddOnContext.prototype,
   'extensions', {
-  get: function() {
-    if (!this._extensions) {
-      this._extensions = new AvailableAddOnExtensionList(this._version, this._solution.sid);
+    get: function() {
+      if (!this._extensions) {
+        this._extensions = new AvailableAddOnExtensionList(this._version, this._solution.sid);
+      }
+      return this._extensions;
     }
-    return this._extensions;
-  }
 });
 
 /* jshint ignore:start */

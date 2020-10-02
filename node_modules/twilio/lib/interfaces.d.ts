@@ -4,6 +4,13 @@ export type Url = string;
 
 export type PhoneNumber = string;
 
+export type PhoneNumberCapabilities = {
+  mms: boolean;
+  sms: boolean;
+  voice: boolean;
+  fax: boolean;
+}
+
 export type Sid = string;
 
 export interface ListEachOptions<TInstance> {
@@ -91,7 +98,7 @@ export type Json<T> = NonFunctionProperties<T>;
 
 export declare class SerializableClass {
   /**
-   * Converts the current instance in a regular JSON. 
+   * Converts the current instance in a regular JSON.
    * It will be automatically called by JSON.stringify()
    */
   toJSON(): Json<this>;

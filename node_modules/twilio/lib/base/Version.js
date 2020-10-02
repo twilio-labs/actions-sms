@@ -49,7 +49,7 @@ Version.prototype.request = function(opts) {
 
 /**
  * Fetch a instance of a record
- * @throws {Error} If response returns non 2xx status code
+ * @throws {Error} If response returns non 2xx or 3xx status code
  *
  * @param  {object} opts request options
  * @return {Promise} promise that resolves to fetched result
@@ -59,11 +59,14 @@ Version.prototype.fetch = function(opts) {
 
   qResponse = qResponse.then(
     function success(response) {
-      if (response.statusCode < 200 || response.statusCode >= 300) {
+      if (response.statusCode < 200 || response.statusCode >= 400) {
         throw new RestException(response);
       }
 
-      return JSON.parse(response.body);
+      if (typeof response.body === 'string') {
+        return JSON.parse(response.body);
+      }
+      return response.body;
     }
   );
 
@@ -85,7 +88,10 @@ Version.prototype.update = function(opts) {
         throw new RestException(response);
       }
 
-      return JSON.parse(response.body);
+      if (typeof response.body === 'string') {
+        return JSON.parse(response.body);
+      }
+      return response.body;
     }
   );
 
@@ -128,8 +134,10 @@ Version.prototype.create = function(opts) {
       if (response.statusCode < 200 || response.statusCode >= 300) {
         throw new RestException(response);
       }
-
-      return JSON.parse(response.body);
+      if (typeof response.body === 'string') {
+        return JSON.parse(response.body);
+      }
+      return response.body;
     }
   );
 

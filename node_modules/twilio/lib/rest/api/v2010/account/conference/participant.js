@@ -62,15 +62,17 @@ ParticipantList = function ParticipantList(version, accountSid, conferenceSid) {
    * @memberof Twilio.Api.V2010.AccountContext.ConferenceContext.ParticipantList#
    *
    * @param {object} opts - Options for request
-   * @param {string} opts.from - The `from` phone number used to invite a participant
+   * @param {string} opts.from -
+   *          The phone number, Client identifier, or username portion of SIP address that made this call.
    * @param {string} opts.to -
-   *          The number, client id, or sip address of the new participant
+   *          The phone number, SIP address or Client identifier that received this call.
    * @param {string} [opts.statusCallback] -
    *          The URL we should call to send status information to your application
    * @param {string} [opts.statusCallbackMethod] -
    *          The HTTP method we should use to call `status_callback`
    * @param {string|list} [opts.statusCallbackEvent] -
    *          Set state change events that will trigger a callback
+   * @param {string} [opts.label] - The label of this participant
    * @param {number} [opts.timeout] -
    *          he number of seconds that we should wait for an answer
    * @param {boolean} [opts.record] -
@@ -121,6 +123,12 @@ ParticipantList = function ParticipantList(version, accountSid, conferenceSid) {
    * @param {boolean} [opts.coaching] - Indicates if the participant changed to coach
    * @param {string} [opts.callSidToCoach] -
    *          The SID of the participant who is being `coached`
+   * @param {string} [opts.jitterBufferSize] -
+   *          Jitter Buffer size for the connecting participant
+   * @param {string} [opts.byoc] - BYOC trunk SID (Beta)
+   * @param {string} [opts.callerId] -
+   *          The phone number, Client identifier, or username portion of SIP address that made this call.
+   * @param {string} [opts.callReason] - Reason for the call (Branded Calls Beta)
    * @param {function} [callback] - Callback to handle processed record
    *
    * @returns {Promise} Resolves to processed ParticipantInstance
@@ -144,6 +152,7 @@ ParticipantList = function ParticipantList(version, accountSid, conferenceSid) {
       'StatusCallback': _.get(opts, 'statusCallback'),
       'StatusCallbackMethod': _.get(opts, 'statusCallbackMethod'),
       'StatusCallbackEvent': serialize.map(_.get(opts, 'statusCallbackEvent'), function(e) { return e; }),
+      'Label': _.get(opts, 'label'),
       'Timeout': _.get(opts, 'timeout'),
       'Record': serialize.bool(_.get(opts, 'record')),
       'Muted': serialize.bool(_.get(opts, 'muted')),
@@ -170,7 +179,11 @@ ParticipantList = function ParticipantList(version, accountSid, conferenceSid) {
       'RecordingStatusCallbackEvent': serialize.map(_.get(opts, 'recordingStatusCallbackEvent'), function(e) { return e; }),
       'ConferenceRecordingStatusCallbackEvent': serialize.map(_.get(opts, 'conferenceRecordingStatusCallbackEvent'), function(e) { return e; }),
       'Coaching': serialize.bool(_.get(opts, 'coaching')),
-      'CallSidToCoach': _.get(opts, 'callSidToCoach')
+      'CallSidToCoach': _.get(opts, 'callSidToCoach'),
+      'JitterBufferSize': _.get(opts, 'jitterBufferSize'),
+      'Byoc': _.get(opts, 'byoc'),
+      'CallerId': _.get(opts, 'callerId'),
+      'CallReason': _.get(opts, 'callReason')
     });
 
     var promise = this._version.create({uri: this._uri, method: 'POST', data: data});
@@ -468,7 +481,8 @@ ParticipantList = function ParticipantList(version, accountSid, conferenceSid) {
    * @function get
    * @memberof Twilio.Api.V2010.AccountContext.ConferenceContext.ParticipantList#
    *
-   * @param {string} callSid - The Call SID of the resource to fetch
+   * @param {string} callSid -
+   *          The Call SID or URL encoded label of the participant to fetch
    *
    * @returns {Twilio.Api.V2010.AccountContext.ConferenceContext.ParticipantContext}
    */
@@ -583,6 +597,7 @@ ParticipantPage.prototype[util.inspect.custom] = function inspect(depth,
  *
  * @property {string} accountSid - The SID of the Account that created the resource
  * @property {string} callSid - The SID of the Call the resource is associated with
+ * @property {string} label - The label of this participant
  * @property {string} callSidToCoach -
  *          The SID of the participant who is being `coached`
  * @property {boolean} coaching - Indicates if the participant changed to coach
@@ -607,7 +622,8 @@ ParticipantPage.prototype[util.inspect.custom] = function inspect(depth,
  * @param {ParticipantPayload} payload - The instance payload
  * @param {sid} accountSid - The SID of the Account that created the resource
  * @param {sid} conferenceSid - The SID of the conference the participant is in
- * @param {sid} callSid - The Call SID of the resource to fetch
+ * @param {sid_like} callSid -
+ *          The Call SID or URL encoded label of the participant to fetch
  */
 /* jshint ignore:end */
 ParticipantInstance = function ParticipantInstance(version, payload, accountSid,
@@ -617,6 +633,7 @@ ParticipantInstance = function ParticipantInstance(version, payload, accountSid,
   // Marshaled Properties
   this.accountSid = payload.account_sid; // jshint ignore:line
   this.callSid = payload.call_sid; // jshint ignore:line
+  this.label = payload.label; // jshint ignore:line
   this.callSidToCoach = payload.call_sid_to_coach; // jshint ignore:line
   this.coaching = payload.coaching; // jshint ignore:line
   this.conferenceSid = payload.conference_sid; // jshint ignore:line
@@ -640,18 +657,18 @@ ParticipantInstance = function ParticipantInstance(version, payload, accountSid,
 
 Object.defineProperty(ParticipantInstance.prototype,
   '_proxy', {
-  get: function() {
-    if (!this._context) {
-      this._context = new ParticipantContext(
-        this._version,
-        this._solution.accountSid,
-        this._solution.conferenceSid,
-        this._solution.callSid
-      );
-    }
+    get: function() {
+      if (!this._context) {
+        this._context = new ParticipantContext(
+          this._version,
+          this._solution.accountSid,
+          this._solution.conferenceSid,
+          this._solution.callSid
+        );
+      }
 
-    return this._context;
-  }
+      return this._context;
+    }
 });
 
 /* jshint ignore:start */
@@ -760,7 +777,8 @@ ParticipantInstance.prototype[util.inspect.custom] = function inspect(depth,
  *          The SID of the Account that created the resource to fetch
  * @param {sid} conferenceSid -
  *          The SID of the conference with the participant to fetch
- * @param {sid} callSid - The Call SID of the resource to fetch
+ * @param {sid_like} callSid -
+ *          The Call SID or URL encoded label of the participant to fetch
  */
 /* jshint ignore:end */
 ParticipantContext = function ParticipantContext(version, accountSid,

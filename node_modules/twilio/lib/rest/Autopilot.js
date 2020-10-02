@@ -22,6 +22,8 @@ var V1 = require('./autopilot/V1');  /* jshint ignore:line */
  *
  * @property {Twilio.Autopilot.V1} v1 - v1 version
  * @property {Twilio.Autopilot.V1.AssistantList} assistants - assistants resource
+ * @property {Twilio.Autopilot.V1.RestoreAssistantList} restoreAssistant -
+ *          restoreAssistant resource
  *
  * @param {Twilio} twilio - The twilio client
  */
@@ -38,17 +40,24 @@ Autopilot.prototype.constructor = Autopilot;
 
 Object.defineProperty(Autopilot.prototype,
   'v1', {
-  get: function() {
-    this._v1 = this._v1 || new V1(this);
-    return this._v1;
-  }
+    get: function() {
+      this._v1 = this._v1 || new V1(this);
+      return this._v1;
+    }
 });
 
 Object.defineProperty(Autopilot.prototype,
   'assistants', {
-  get: function() {
-    return this.v1.assistants;
-  }
+    get: function() {
+      return this.v1.assistants;
+    }
+});
+
+Object.defineProperty(Autopilot.prototype,
+  'restoreAssistant', {
+    get: function() {
+      return this.v1.restoreAssistant;
+    }
 });
 
 module.exports = Autopilot;

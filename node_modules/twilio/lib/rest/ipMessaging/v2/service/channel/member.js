@@ -76,6 +76,8 @@ MemberList = function MemberList(version, serviceSid, channelSid) {
    *          The ISO 8601 date and time in GMT when the resource was updated
    * @param {string} [opts.attributes] -
    *          A valid JSON string that contains application-specific data
+   * @param {member.webhook_enabled_type} [opts.xTwilioWebhookEnabled] -
+   *          The X-Twilio-Webhook-Enabled HTTP request header
    * @param {function} [callback] - Callback to handle processed record
    *
    * @returns {Promise} Resolves to processed MemberInstance
@@ -99,8 +101,9 @@ MemberList = function MemberList(version, serviceSid, channelSid) {
       'DateUpdated': serialize.iso8601DateTime(_.get(opts, 'dateUpdated')),
       'Attributes': _.get(opts, 'attributes')
     });
+    var headers = values.of({'X-Twilio-Webhook-Enabled': _.get(opts, 'xTwilioWebhookEnabled')});
 
-    var promise = this._version.create({uri: this._uri, method: 'POST', data: data});
+    var promise = this._version.create({uri: this._uri, method: 'POST', data: data, headers: headers});
 
     promise = promise.then(function(payload) {
       deferred.resolve(new MemberInstance(
@@ -539,18 +542,18 @@ MemberInstance = function MemberInstance(version, payload, serviceSid,
 
 Object.defineProperty(MemberInstance.prototype,
   '_proxy', {
-  get: function() {
-    if (!this._context) {
-      this._context = new MemberContext(
-        this._version,
-        this._solution.serviceSid,
-        this._solution.channelSid,
-        this._solution.sid
-      );
-    }
+    get: function() {
+      if (!this._context) {
+        this._context = new MemberContext(
+          this._version,
+          this._solution.serviceSid,
+          this._solution.channelSid,
+          this._solution.sid
+        );
+      }
 
-    return this._context;
-  }
+      return this._context;
+    }
 });
 
 /* jshint ignore:start */
@@ -576,13 +579,16 @@ MemberInstance.prototype.fetch = function fetch(callback) {
  * @function remove
  * @memberof Twilio.IpMessaging.V2.ServiceContext.ChannelContext.MemberInstance#
  *
+ * @param {object} [opts] - Options for request
+ * @param {member.webhook_enabled_type} [opts.xTwilioWebhookEnabled] -
+ *          The X-Twilio-Webhook-Enabled HTTP request header
  * @param {function} [callback] - Callback to handle processed record
  *
  * @returns {Promise} Resolves to processed MemberInstance
  */
 /* jshint ignore:end */
-MemberInstance.prototype.remove = function remove(callback) {
-  return this._proxy.remove(callback);
+MemberInstance.prototype.remove = function remove(opts, callback) {
+  return this._proxy.remove(opts, callback);
 };
 
 /* jshint ignore:start */
@@ -604,6 +610,8 @@ MemberInstance.prototype.remove = function remove(callback) {
  *          The ISO 8601 date and time in GMT when the resource was updated
  * @param {string} [opts.attributes] -
  *          A valid JSON string that contains application-specific data
+ * @param {member.webhook_enabled_type} [opts.xTwilioWebhookEnabled] -
+ *          The X-Twilio-Webhook-Enabled HTTP request header
  * @param {function} [callback] - Callback to handle processed record
  *
  * @returns {Promise} Resolves to processed MemberInstance
@@ -703,14 +711,25 @@ MemberContext.prototype.fetch = function fetch(callback) {
  * @function remove
  * @memberof Twilio.IpMessaging.V2.ServiceContext.ChannelContext.MemberContext#
  *
+ * @param {object} [opts] - Options for request
+ * @param {member.webhook_enabled_type} [opts.xTwilioWebhookEnabled] -
+ *          The X-Twilio-Webhook-Enabled HTTP request header
  * @param {function} [callback] - Callback to handle processed record
  *
  * @returns {Promise} Resolves to processed MemberInstance
  */
 /* jshint ignore:end */
-MemberContext.prototype.remove = function remove(callback) {
+MemberContext.prototype.remove = function remove(opts, callback) {
+  if (_.isFunction(opts)) {
+    callback = opts;
+    opts = {};
+  }
+  opts = opts || {};
+
   var deferred = Q.defer();
-  var promise = this._version.remove({uri: this._uri, method: 'DELETE'});
+  var headers = values.of({'X-Twilio-Webhook-Enabled': _.get(opts, 'xTwilioWebhookEnabled')});
+
+  var promise = this._version.remove({uri: this._uri, method: 'DELETE', headers: headers});
 
   promise = promise.then(function(payload) {
     deferred.resolve(payload);
@@ -746,6 +765,8 @@ MemberContext.prototype.remove = function remove(callback) {
  *          The ISO 8601 date and time in GMT when the resource was updated
  * @param {string} [opts.attributes] -
  *          A valid JSON string that contains application-specific data
+ * @param {member.webhook_enabled_type} [opts.xTwilioWebhookEnabled] -
+ *          The X-Twilio-Webhook-Enabled HTTP request header
  * @param {function} [callback] - Callback to handle processed record
  *
  * @returns {Promise} Resolves to processed MemberInstance
@@ -767,8 +788,9 @@ MemberContext.prototype.update = function update(opts, callback) {
     'DateUpdated': serialize.iso8601DateTime(_.get(opts, 'dateUpdated')),
     'Attributes': _.get(opts, 'attributes')
   });
+  var headers = values.of({'X-Twilio-Webhook-Enabled': _.get(opts, 'xTwilioWebhookEnabled')});
 
-  var promise = this._version.update({uri: this._uri, method: 'POST', data: data});
+  var promise = this._version.update({uri: this._uri, method: 'POST', data: data, headers: headers});
 
   promise = promise.then(function(payload) {
     deferred.resolve(new MemberInstance(

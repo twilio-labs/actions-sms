@@ -10,6 +10,7 @@
 /* jshint ignore:end */
 
 var _ = require('lodash');  /* jshint ignore:line */
+var FormList = require('./v2/form').FormList;
 var ServiceList = require('./v2/service').ServiceList;
 var Version = require('../../base/Version');  /* jshint ignore:line */
 
@@ -20,6 +21,7 @@ var Version = require('../../base/Version');  /* jshint ignore:line */
  *
  * @constructor Twilio.Verify.V2
  *
+ * @property {Twilio.Verify.V2.FormList} forms - forms resource
  * @property {Twilio.Verify.V2.ServiceList} services - services resource
  *
  * @param {Twilio.Verify} domain - The twilio domain
@@ -29,6 +31,7 @@ function V2(domain) {
   Version.prototype.constructor.call(this, domain, 'v2');
 
   // Resources
+  this._forms = undefined;
   this._services = undefined;
 }
 
@@ -36,11 +39,19 @@ _.extend(V2.prototype, Version.prototype);
 V2.prototype.constructor = V2;
 
 Object.defineProperty(V2.prototype,
+  'forms', {
+    get: function() {
+      this._forms = this._forms || new FormList(this);
+      return this._forms;
+    }
+});
+
+Object.defineProperty(V2.prototype,
   'services', {
-  get: function() {
-    this._services = this._services || new ServiceList(this);
-    return this._services;
-  }
+    get: function() {
+      this._services = this._services || new ServiceList(this);
+      return this._services;
+    }
 });
 
 module.exports = V2;

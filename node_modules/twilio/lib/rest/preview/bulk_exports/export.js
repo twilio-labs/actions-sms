@@ -13,6 +13,9 @@ var Q = require('q');  /* jshint ignore:line */
 var _ = require('lodash');  /* jshint ignore:line */
 var util = require('util');  /* jshint ignore:line */
 var DayList = require('./export/day').DayList;
+var ExportCustomJobList = require(
+    './export/exportCustomJob').ExportCustomJobList;
+var JobList = require('./export/job').JobList;
 var Page = require('../../../base/Page');  /* jshint ignore:line */
 var values = require('../../../base/values');  /* jshint ignore:line */
 
@@ -52,6 +55,10 @@ ExportList = function ExportList(version) {
   ExportListInstance._version = version;
   // Path Solution
   ExportListInstance._solution = {};
+
+  // Components
+  ExportListInstance._jobs = undefined;
+
   /* jshint ignore:start */
   /**
    * Constructs a export
@@ -59,7 +66,7 @@ ExportList = function ExportList(version) {
    * @function get
    * @memberof Twilio.Preview.BulkExports.ExportList#
    *
-   * @param {string} resourceType - The resource_type
+   * @param {string} resourceType - The type of communication – Messages, Calls
    *
    * @returns {Twilio.Preview.BulkExports.ExportContext}
    */
@@ -67,6 +74,17 @@ ExportList = function ExportList(version) {
   ExportListInstance.get = function get(resourceType) {
     return new ExportContext(this._version, resourceType);
   };
+
+  Object.defineProperty(ExportListInstance,
+    'jobs', {
+      get: function jobs() {
+        if (!this._jobs) {
+          this._jobs = new JobList(this._version);
+        }
+
+        return this._jobs;
+      }
+  });
 
   /* jshint ignore:start */
   /**
@@ -168,13 +186,13 @@ ExportPage.prototype[util.inspect.custom] = function inspect(depth, options) {
  *
  * @constructor Twilio.Preview.BulkExports.ExportInstance
  *
- * @property {string} resourceType - The resource_type
- * @property {string} url - The url
- * @property {string} links - The links
+ * @property {string} resourceType - The type of communication – Messages, Calls
+ * @property {string} url - The URL of this resource.
+ * @property {string} links - Nested resource URLs.
  *
  * @param {BulkExports} version - Version of the resource
  * @param {ExportPayload} payload - The instance payload
- * @param {string} resourceType - The resource_type
+ * @param {string} resourceType - The type of communication – Messages, Calls
  */
 /* jshint ignore:end */
 ExportInstance = function ExportInstance(version, payload, resourceType) {
@@ -192,13 +210,13 @@ ExportInstance = function ExportInstance(version, payload, resourceType) {
 
 Object.defineProperty(ExportInstance.prototype,
   '_proxy', {
-  get: function() {
-    if (!this._context) {
-      this._context = new ExportContext(this._version, this._solution.resourceType);
-    }
+    get: function() {
+      if (!this._context) {
+        this._context = new ExportContext(this._version, this._solution.resourceType);
+      }
 
-    return this._context;
-  }
+      return this._context;
+    }
 });
 
 /* jshint ignore:start */
@@ -229,6 +247,20 @@ ExportInstance.prototype.fetch = function fetch(callback) {
 /* jshint ignore:end */
 ExportInstance.prototype.days = function days() {
   return this._proxy.days;
+};
+
+/* jshint ignore:start */
+/**
+ * Access the exportCustomJobs
+ *
+ * @function exportCustomJobs
+ * @memberof Twilio.Preview.BulkExports.ExportInstance#
+ *
+ * @returns {Twilio.Preview.BulkExports.ExportContext.ExportCustomJobList}
+ */
+/* jshint ignore:end */
+ExportInstance.prototype.exportCustomJobs = function exportCustomJobs() {
+  return this._proxy.exportCustomJobs;
 };
 
 /* jshint ignore:start */
@@ -269,9 +301,11 @@ ExportInstance.prototype[util.inspect.custom] = function inspect(depth, options)
  *
  * @property {Twilio.Preview.BulkExports.ExportContext.DayList} days -
  *          days resource
+ * @property {Twilio.Preview.BulkExports.ExportContext.ExportCustomJobList} exportCustomJobs -
+ *          exportCustomJobs resource
  *
  * @param {BulkExports} version - Version of the resource
- * @param {string} resourceType - The resource_type
+ * @param {string} resourceType - The type of communication – Messages, Calls
  */
 /* jshint ignore:end */
 ExportContext = function ExportContext(version, resourceType) {
@@ -283,6 +317,7 @@ ExportContext = function ExportContext(version, resourceType) {
 
   // Dependents
   this._days = undefined;
+  this._exportCustomJobs = undefined;
 };
 
 /* jshint ignore:start */
@@ -318,12 +353,22 @@ ExportContext.prototype.fetch = function fetch(callback) {
 
 Object.defineProperty(ExportContext.prototype,
   'days', {
-  get: function() {
-    if (!this._days) {
-      this._days = new DayList(this._version, this._solution.resourceType);
+    get: function() {
+      if (!this._days) {
+        this._days = new DayList(this._version, this._solution.resourceType);
+      }
+      return this._days;
     }
-    return this._days;
-  }
+});
+
+Object.defineProperty(ExportContext.prototype,
+  'exportCustomJobs', {
+    get: function() {
+      if (!this._exportCustomJobs) {
+        this._exportCustomJobs = new ExportCustomJobList(this._version, this._solution.resourceType);
+      }
+      return this._exportCustomJobs;
+    }
 });
 
 /* jshint ignore:start */

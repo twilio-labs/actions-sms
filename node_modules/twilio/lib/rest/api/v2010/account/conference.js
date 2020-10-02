@@ -477,6 +477,10 @@ ConferencePage.prototype[util.inspect.custom] = function inspect(depth, options)
  *          The URI of this resource, relative to `https://api.twilio.com`
  * @property {string} subresourceUris -
  *          A list of related resources identified by their relative URIs
+ * @property {conference.reason_conference_ended} reasonConferenceEnded -
+ *          The reason why a conference ended.
+ * @property {string} callSidEndingConference -
+ *          The call SID that caused the conference to end
  *
  * @param {V2010} version - Version of the resource
  * @param {ConferencePayload} payload - The instance payload
@@ -499,6 +503,8 @@ ConferenceInstance = function ConferenceInstance(version, payload, accountSid,
   this.status = payload.status; // jshint ignore:line
   this.uri = payload.uri; // jshint ignore:line
   this.subresourceUris = payload.subresource_uris; // jshint ignore:line
+  this.reasonConferenceEnded = payload.reason_conference_ended; // jshint ignore:line
+  this.callSidEndingConference = payload.call_sid_ending_conference; // jshint ignore:line
 
   // Context
   this._context = undefined;
@@ -507,13 +513,13 @@ ConferenceInstance = function ConferenceInstance(version, payload, accountSid,
 
 Object.defineProperty(ConferenceInstance.prototype,
   '_proxy', {
-  get: function() {
-    if (!this._context) {
-      this._context = new ConferenceContext(this._version, this._solution.accountSid, this._solution.sid);
-    }
+    get: function() {
+      if (!this._context) {
+        this._context = new ConferenceContext(this._version, this._solution.accountSid, this._solution.sid);
+      }
 
-    return this._context;
-  }
+      return this._context;
+    }
 });
 
 /* jshint ignore:start */
@@ -727,26 +733,26 @@ ConferenceContext.prototype.update = function update(opts, callback) {
 
 Object.defineProperty(ConferenceContext.prototype,
   'participants', {
-  get: function() {
-    if (!this._participants) {
-      this._participants = new ParticipantList(
-        this._version,
-        this._solution.accountSid,
-        this._solution.sid
-      );
+    get: function() {
+      if (!this._participants) {
+        this._participants = new ParticipantList(
+          this._version,
+          this._solution.accountSid,
+          this._solution.sid
+        );
+      }
+      return this._participants;
     }
-    return this._participants;
-  }
 });
 
 Object.defineProperty(ConferenceContext.prototype,
   'recordings', {
-  get: function() {
-    if (!this._recordings) {
-      this._recordings = new RecordingList(this._version, this._solution.accountSid, this._solution.sid);
+    get: function() {
+      if (!this._recordings) {
+        this._recordings = new RecordingList(this._version, this._solution.accountSid, this._solution.sid);
+      }
+      return this._recordings;
     }
-    return this._recordings;
-  }
 });
 
 /* jshint ignore:start */

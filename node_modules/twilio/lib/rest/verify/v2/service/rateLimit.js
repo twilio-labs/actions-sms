@@ -27,9 +27,6 @@ var RateLimitContext;
 /**
  * Initialize the RateLimitList
  *
- * PLEASE NOTE that this class contains beta products that are subject to change.
- * Use them with caution.
- *
  * @constructor Twilio.Verify.V2.ServiceContext.RateLimitList
  *
  * @param {Twilio.Verify.V2} version - Version of the resource
@@ -394,9 +391,6 @@ RateLimitList = function RateLimitList(version, serviceSid) {
 /**
  * Initialize the RateLimitPage
  *
- * PLEASE NOTE that this class contains beta products that are subject to change.
- * Use them with caution.
- *
  * @constructor Twilio.Verify.V2.ServiceContext.RateLimitPage
  *
  * @param {V2} version - Version of the resource
@@ -462,9 +456,6 @@ RateLimitPage.prototype[util.inspect.custom] = function inspect(depth, options)
 /**
  * Initialize the RateLimitContext
  *
- * PLEASE NOTE that this class contains beta products that are subject to change.
- * Use them with caution.
- *
  * @constructor Twilio.Verify.V2.ServiceContext.RateLimitInstance
  *
  * @property {string} sid - A string that uniquely identifies this Rate Limit.
@@ -510,13 +501,13 @@ RateLimitInstance = function RateLimitInstance(version, payload, serviceSid,
 
 Object.defineProperty(RateLimitInstance.prototype,
   '_proxy', {
-  get: function() {
-    if (!this._context) {
-      this._context = new RateLimitContext(this._version, this._solution.serviceSid, this._solution.sid);
-    }
+    get: function() {
+      if (!this._context) {
+        this._context = new RateLimitContext(this._version, this._solution.serviceSid, this._solution.sid);
+      }
 
-    return this._context;
-  }
+      return this._context;
+    }
 });
 
 /* jshint ignore:start */
@@ -612,9 +603,6 @@ RateLimitInstance.prototype[util.inspect.custom] = function inspect(depth,
 /* jshint ignore:start */
 /**
  * Initialize the RateLimitContext
- *
- * PLEASE NOTE that this class contains beta products that are subject to change.
- * Use them with caution.
  *
  * @constructor Twilio.Verify.V2.ServiceContext.RateLimitContext
  *
@@ -753,12 +741,12 @@ RateLimitContext.prototype.remove = function remove(callback) {
 
 Object.defineProperty(RateLimitContext.prototype,
   'buckets', {
-  get: function() {
-    if (!this._buckets) {
-      this._buckets = new BucketList(this._version, this._solution.serviceSid, this._solution.sid);
+    get: function() {
+      if (!this._buckets) {
+        this._buckets = new BucketList(this._version, this._solution.serviceSid, this._solution.sid);
+      }
+      return this._buckets;
     }
-    return this._buckets;
-  }
 });
 
 /* jshint ignore:start */

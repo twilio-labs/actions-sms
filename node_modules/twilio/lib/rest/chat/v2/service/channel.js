@@ -77,6 +77,8 @@ ChannelList = function ChannelList(version, serviceSid) {
    *          The ISO 8601 date and time in GMT when the resource was updated
    * @param {string} [opts.createdBy] -
    *          The identity of the User that created the Channel
+   * @param {channel.webhook_enabled_type} [opts.xTwilioWebhookEnabled] -
+   *          The X-Twilio-Webhook-Enabled HTTP request header
    * @param {function} [callback] - Callback to handle processed record
    *
    * @returns {Promise} Resolves to processed ChannelInstance
@@ -99,8 +101,9 @@ ChannelList = function ChannelList(version, serviceSid) {
       'DateUpdated': serialize.iso8601DateTime(_.get(opts, 'dateUpdated')),
       'CreatedBy': _.get(opts, 'createdBy')
     });
+    var headers = values.of({'X-Twilio-Webhook-Enabled': _.get(opts, 'xTwilioWebhookEnabled')});
 
-    var promise = this._version.create({uri: this._uri, method: 'POST', data: data});
+    var promise = this._version.create({uri: this._uri, method: 'POST', data: data, headers: headers});
 
     promise = promise.then(function(payload) {
       deferred.resolve(new ChannelInstance(
@@ -538,13 +541,13 @@ ChannelInstance = function ChannelInstance(version, payload, serviceSid, sid) {
 
 Object.defineProperty(ChannelInstance.prototype,
   '_proxy', {
-  get: function() {
-    if (!this._context) {
-      this._context = new ChannelContext(this._version, this._solution.serviceSid, this._solution.sid);
-    }
+    get: function() {
+      if (!this._context) {
+        this._context = new ChannelContext(this._version, this._solution.serviceSid, this._solution.sid);
+      }
 
-    return this._context;
-  }
+      return this._context;
+    }
 });
 
 /* jshint ignore:start */
@@ -570,13 +573,16 @@ ChannelInstance.prototype.fetch = function fetch(callback) {
  * @function remove
  * @memberof Twilio.Chat.V2.ServiceContext.ChannelInstance#
  *
+ * @param {object} [opts] - Options for request
+ * @param {channel.webhook_enabled_type} [opts.xTwilioWebhookEnabled] -
+ *          The X-Twilio-Webhook-Enabled HTTP request header
  * @param {function} [callback] - Callback to handle processed record
  *
  * @returns {Promise} Resolves to processed ChannelInstance
  */
 /* jshint ignore:end */
-ChannelInstance.prototype.remove = function remove(callback) {
-  return this._proxy.remove(callback);
+ChannelInstance.prototype.remove = function remove(opts, callback) {
+  return this._proxy.remove(opts, callback);
 };
 
 /* jshint ignore:start */
@@ -598,6 +604,8 @@ ChannelInstance.prototype.remove = function remove(callback) {
  *          The ISO 8601 date and time in GMT when the resource was updated
  * @param {string} [opts.createdBy] -
  *          The identity of the User that created the Channel
+ * @param {channel.webhook_enabled_type} [opts.xTwilioWebhookEnabled] -
+ *          The X-Twilio-Webhook-Enabled HTTP request header
  * @param {function} [callback] - Callback to handle processed record
  *
  * @returns {Promise} Resolves to processed ChannelInstance
@@ -766,14 +774,25 @@ ChannelContext.prototype.fetch = function fetch(callback) {
  * @function remove
  * @memberof Twilio.Chat.V2.ServiceContext.ChannelContext#
  *
+ * @param {object} [opts] - Options for request
+ * @param {channel.webhook_enabled_type} [opts.xTwilioWebhookEnabled] -
+ *          The X-Twilio-Webhook-Enabled HTTP request header
  * @param {function} [callback] - Callback to handle processed record
  *
  * @returns {Promise} Resolves to processed ChannelInstance
  */
 /* jshint ignore:end */
-ChannelContext.prototype.remove = function remove(callback) {
+ChannelContext.prototype.remove = function remove(opts, callback) {
+  if (_.isFunction(opts)) {
+    callback = opts;
+    opts = {};
+  }
+  opts = opts || {};
+
   var deferred = Q.defer();
-  var promise = this._version.remove({uri: this._uri, method: 'DELETE'});
+  var headers = values.of({'X-Twilio-Webhook-Enabled': _.get(opts, 'xTwilioWebhookEnabled')});
+
+  var promise = this._version.remove({uri: this._uri, method: 'DELETE', headers: headers});
 
   promise = promise.then(function(payload) {
     deferred.resolve(payload);
@@ -809,6 +828,8 @@ ChannelContext.prototype.remove = function remove(callback) {
  *          The ISO 8601 date and time in GMT when the resource was updated
  * @param {string} [opts.createdBy] -
  *          The identity of the User that created the Channel
+ * @param {channel.webhook_enabled_type} [opts.xTwilioWebhookEnabled] -
+ *          The X-Twilio-Webhook-Enabled HTTP request header
  * @param {function} [callback] - Callback to handle processed record
  *
  * @returns {Promise} Resolves to processed ChannelInstance
@@ -830,8 +851,9 @@ ChannelContext.prototype.update = function update(opts, callback) {
     'DateUpdated': serialize.iso8601DateTime(_.get(opts, 'dateUpdated')),
     'CreatedBy': _.get(opts, 'createdBy')
   });
+  var headers = values.of({'X-Twilio-Webhook-Enabled': _.get(opts, 'xTwilioWebhookEnabled')});
 
-  var promise = this._version.update({uri: this._uri, method: 'POST', data: data});
+  var promise = this._version.update({uri: this._uri, method: 'POST', data: data, headers: headers});
 
   promise = promise.then(function(payload) {
     deferred.resolve(new ChannelInstance(
@@ -855,42 +877,42 @@ ChannelContext.prototype.update = function update(opts, callback) {
 
 Object.defineProperty(ChannelContext.prototype,
   'members', {
-  get: function() {
-    if (!this._members) {
-      this._members = new MemberList(this._version, this._solution.serviceSid, this._solution.sid);
+    get: function() {
+      if (!this._members) {
+        this._members = new MemberList(this._version, this._solution.serviceSid, this._solution.sid);
+      }
+      return this._members;
     }
-    return this._members;
-  }
 });
 
 Object.defineProperty(ChannelContext.prototype,
   'messages', {
-  get: function() {
-    if (!this._messages) {
-      this._messages = new MessageList(this._version, this._solution.serviceSid, this._solution.sid);
+    get: function() {
+      if (!this._messages) {
+        this._messages = new MessageList(this._version, this._solution.serviceSid, this._solution.sid);
+      }
+      return this._messages;
     }
-    return this._messages;
-  }
 });
 
 Object.defineProperty(ChannelContext.prototype,
   'invites', {
-  get: function() {
-    if (!this._invites) {
-      this._invites = new InviteList(this._version, this._solution.serviceSid, this._solution.sid);
+    get: function() {
+      if (!this._invites) {
+        this._invites = new InviteList(this._version, this._solution.serviceSid, this._solution.sid);
+      }
+      return this._invites;
     }
-    return this._invites;
-  }
 });
 
 Object.defineProperty(ChannelContext.prototype,
   'webhooks', {
-  get: function() {
-    if (!this._webhooks) {
-      this._webhooks = new WebhookList(this._version, this._solution.serviceSid, this._solution.sid);
+    get: function() {
+      if (!this._webhooks) {
+        this._webhooks = new WebhookList(this._version, this._solution.serviceSid, this._solution.sid);
+      }
+      return this._webhooks;
     }
-    return this._webhooks;
-  }
 });
 
 /* jshint ignore:start */

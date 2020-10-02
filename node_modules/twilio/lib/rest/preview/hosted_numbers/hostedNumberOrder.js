@@ -535,7 +535,8 @@ HostedNumberOrderPage.prototype[util.inspect.custom] = function inspect(depth,
  * @property {string} addressSid - Address sid.
  * @property {string} signingDocumentSid - LOA document sid.
  * @property {string} phoneNumber - An E164 formatted phone number.
- * @property {string} capabilities - A mapping of phone number capabilities.
+ * @property {PhoneNumberCapabilities} capabilities -
+ *          A mapping of phone number capabilities.
  * @property {string} friendlyName - A human readable description of this resource.
  * @property {string} uniqueName -
  *          A unique, developer assigned name of this HostedNumberOrder.
@@ -603,13 +604,13 @@ HostedNumberOrderInstance = function HostedNumberOrderInstance(version, payload,
 
 Object.defineProperty(HostedNumberOrderInstance.prototype,
   '_proxy', {
-  get: function() {
-    if (!this._context) {
-      this._context = new HostedNumberOrderContext(this._version, this._solution.sid);
-    }
+    get: function() {
+      if (!this._context) {
+        this._context = new HostedNumberOrderContext(this._version, this._solution.sid);
+      }
 
-    return this._context;
-  }
+      return this._context;
+    }
 });
 
 /* jshint ignore:start */

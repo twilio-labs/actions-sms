@@ -18,11 +18,30 @@ import { SerializableClass } from '../../../../interfaces';
  * access, please contact help@twilio.com.
  *
  * @param version - Version of the resource
- * @param resourceType - The resource_type
+ * @param resourceType - The type of communication – Messages, Calls
  */
 declare function DayList(version: BulkExports, resourceType: string): DayListInstance;
 
 interface DayListInstance {
+  /**
+   * @param sid - sid of instance
+   */
+  (sid: string): DayContext;
+  /**
+   * Streams DayInstance records from the API.
+   *
+   * This operation lazily loads records as efficiently as possible until the limit
+   * is reached.
+   *
+   * The results are passed into the callback function, so this operation is memory
+   * efficient.
+   *
+   * If a function is passed as the first argument, it will be used as the callback
+   * function.
+   *
+   * @param callback - Function to process each record
+   */
+  each(callback?: (item: DayInstance, done: (err?: Error) => void) => void): void;
   /**
    * Streams DayInstance records from the API.
    *
@@ -39,6 +58,23 @@ interface DayListInstance {
    * @param callback - Function to process each record
    */
   each(opts?: DayListInstanceEachOptions, callback?: (item: DayInstance, done: (err?: Error) => void) => void): void;
+  /**
+   * Constructs a day
+   *
+   * @param day - The date of the data in the file
+   */
+  get(day: string): DayContext;
+  /**
+   * Retrieve a single target page of DayInstance records from the API.
+   *
+   * The request is executed immediately.
+   *
+   * If a function is passed as the first argument, it will be used as the callback
+   * function.
+   *
+   * @param callback - Callback to handle list of records
+   */
+  getPage(callback?: (error: Error | null, items: DayPage) => any): Promise<DayPage>;
   /**
    * Retrieve a single target page of DayInstance records from the API.
    *
@@ -57,10 +93,30 @@ interface DayListInstance {
    * If a function is passed as the first argument, it will be used as the callback
    * function.
    *
+   * @param callback - Callback to handle list of records
+   */
+  list(callback?: (error: Error | null, items: DayInstance[]) => any): Promise<DayInstance[]>;
+  /**
+   * Lists DayInstance records from the API as a list.
+   *
+   * If a function is passed as the first argument, it will be used as the callback
+   * function.
+   *
    * @param opts - Options for request
    * @param callback - Callback to handle list of records
    */
   list(opts?: DayListInstanceOptions, callback?: (error: Error | null, items: DayInstance[]) => any): Promise<DayInstance[]>;
+  /**
+   * Retrieve a single page of DayInstance records from the API.
+   *
+   * The request is executed immediately.
+   *
+   * If a function is passed as the first argument, it will be used as the callback
+   * function.
+   *
+   * @param callback - Callback to handle list of records
+   */
+  page(callback?: (error: Error | null, items: DayPage) => any): Promise<DayPage>;
   /**
    * Retrieve a single page of DayInstance records from the API.
    *
@@ -90,18 +146,22 @@ interface DayListInstance {
  *                         Upper limit for the number of records to return.
  *                         each() guarantees never to return more than limit.
  *                         Default is no limit
+ * @property nextToken - The next_token
  * @property pageSize -
  *                         Number of records to fetch per request,
  *                         when not set will use the default value of 50 records.
  *                         If no pageSize is defined but a limit is defined,
  *                         each() will attempt to read the limit with the most efficient
  *                         page size, i.e. min(limit, 1000)
+ * @property previousToken - The previous_token
  */
 interface DayListInstanceEachOptions {
   callback?: (item: DayInstance, done: (err?: Error) => void) => void;
   done?: Function;
   limit?: number;
+  nextToken?: string;
   pageSize?: number;
+  previousToken?: string;
 }
 
 /**
@@ -111,36 +171,46 @@ interface DayListInstanceEachOptions {
  *                         Upper limit for the number of records to return.
  *                         list() guarantees never to return more than limit.
  *                         Default is no limit
+ * @property nextToken - The next_token
  * @property pageSize -
  *                         Number of records to fetch per request,
  *                         when not set will use the default value of 50 records.
  *                         If no page_size is defined but a limit is defined,
  *                         list() will attempt to read the limit with the most
  *                         efficient page size, i.e. min(limit, 1000)
+ * @property previousToken - The previous_token
  */
 interface DayListInstanceOptions {
   limit?: number;
+  nextToken?: string;
   pageSize?: number;
+  previousToken?: string;
 }
 
 /**
  * Options to pass to page
  *
+ * @property nextToken - The next_token
  * @property pageNumber - Page Number, this value is simply for client state
  * @property pageSize - Number of records to return, defaults to 50
  * @property pageToken - PageToken provided by the API
+ * @property previousToken - The previous_token
  */
 interface DayListInstancePageOptions {
+  nextToken?: string;
   pageNumber?: number;
   pageSize?: number;
   pageToken?: string;
+  previousToken?: string;
 }
 
 interface DayPayload extends DayResource, Page.TwilioResponsePayload {
 }
 
 interface DayResource {
+  create_date?: string;
   day?: string;
+  friendly_name?: string;
   redirect_to?: string;
   resource_type?: string;
   size?: number;
@@ -148,6 +218,33 @@ interface DayResource {
 
 interface DaySolution {
   resourceType?: string;
+}
+
+
+declare class DayContext {
+  /**
+   * Initialize the DayContext
+   *
+   * PLEASE NOTE that this class contains preview products that are subject to
+   * change. Use them with caution. If you currently do not have developer preview
+   * access, please contact help@twilio.com.
+   *
+   * @param version - Version of the resource
+   * @param resourceType - The type of communication – Messages, Calls
+   * @param day - The date of the data in the file
+   */
+  constructor(version: BulkExports, resourceType: string, day: string);
+
+  /**
+   * fetch a DayInstance
+   *
+   * @param callback - Callback to handle processed record
+   */
+  fetch(callback?: (error: Error | null, items: DayInstance) => any): Promise<DayInstance>;
+  /**
+   * Provide a user-friendly representation
+   */
+  toJSON(): any;
 }
 
 
@@ -161,11 +258,21 @@ declare class DayInstance extends SerializableClass {
    *
    * @param version - Version of the resource
    * @param payload - The instance payload
-   * @param resourceType - The resource_type
+   * @param resourceType - The type of communication – Messages, Calls
+   * @param day - The date of the data in the file
    */
-  constructor(version: BulkExports, payload: DayPayload, resourceType: string);
+  constructor(version: BulkExports, payload: DayPayload, resourceType: string, day: string);
 
+  private _proxy: DayContext;
+  createDate: string;
   day: string;
+  /**
+   * fetch a DayInstance
+   *
+   * @param callback - Callback to handle processed record
+   */
+  fetch(callback?: (error: Error | null, items: DayInstance) => any): Promise<DayInstance>;
+  friendlyName: string;
   redirectTo: string;
   resourceType: string;
   size: number;
@@ -202,4 +309,4 @@ declare class DayPage extends Page<BulkExports, DayPayload, DayResource, DayInst
   toJSON(): any;
 }
 
-export { DayInstance, DayList, DayListInstance, DayListInstanceEachOptions, DayListInstanceOptions, DayListInstancePageOptions, DayPage, DayPayload, DayResource, DaySolution }
+export { DayContext, DayInstance, DayList, DayListInstance, DayListInstanceEachOptions, DayListInstanceOptions, DayListInstancePageOptions, DayPage, DayPayload, DayResource, DaySolution }

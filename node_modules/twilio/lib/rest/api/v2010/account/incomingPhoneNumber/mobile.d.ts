@@ -8,10 +8,14 @@
 import Page = require('../../../../../base/Page');
 import Response = require('../../../../../http/response');
 import V2010 = require('../../../V2010');
-import serialize = require('../../../../../base/serialize');
+import { PhoneNumberCapabilities } from '../../../../../interfaces';
 import { SerializableClass } from '../../../../../interfaces';
 
 type MobileAddressRequirement = 'none'|'any'|'local'|'foreign';
+
+type MobileEmergencyStatus = 'Active'|'Inactive';
+
+type MobileVoiceReceiveMode = 'voice'|'fax';
 
 /**
  * Initialize the MobileList
@@ -41,10 +45,36 @@ interface MobileListInstance {
    * If a function is passed as the first argument, it will be used as the callback
    * function.
    *
+   * @param callback - Function to process each record
+   */
+  each(callback?: (item: MobileInstance, done: (err?: Error) => void) => void): void;
+  /**
+   * Streams MobileInstance records from the API.
+   *
+   * This operation lazily loads records as efficiently as possible until the limit
+   * is reached.
+   *
+   * The results are passed into the callback function, so this operation is memory
+   * efficient.
+   *
+   * If a function is passed as the first argument, it will be used as the callback
+   * function.
+   *
    * @param opts - Options for request
    * @param callback - Function to process each record
    */
   each(opts?: MobileListInstanceEachOptions, callback?: (item: MobileInstance, done: (err?: Error) => void) => void): void;
+  /**
+   * Retrieve a single target page of MobileInstance records from the API.
+   *
+   * The request is executed immediately.
+   *
+   * If a function is passed as the first argument, it will be used as the callback
+   * function.
+   *
+   * @param callback - Callback to handle list of records
+   */
+  getPage(callback?: (error: Error | null, items: MobilePage) => any): Promise<MobilePage>;
   /**
    * Retrieve a single target page of MobileInstance records from the API.
    *
@@ -63,10 +93,30 @@ interface MobileListInstance {
    * If a function is passed as the first argument, it will be used as the callback
    * function.
    *
+   * @param callback - Callback to handle list of records
+   */
+  list(callback?: (error: Error | null, items: MobileInstance[]) => any): Promise<MobileInstance[]>;
+  /**
+   * Lists MobileInstance records from the API as a list.
+   *
+   * If a function is passed as the first argument, it will be used as the callback
+   * function.
+   *
    * @param opts - Options for request
    * @param callback - Callback to handle list of records
    */
   list(opts?: MobileListInstanceOptions, callback?: (error: Error | null, items: MobileInstance[]) => any): Promise<MobileInstance[]>;
+  /**
+   * Retrieve a single page of MobileInstance records from the API.
+   *
+   * The request is executed immediately.
+   *
+   * If a function is passed as the first argument, it will be used as the callback
+   * function.
+   *
+   * @param callback - Callback to handle list of records
+   */
+  page(callback?: (error: Error | null, items: MobilePage) => any): Promise<MobilePage>;
   /**
    * Retrieve a single page of MobileInstance records from the API.
    *
@@ -90,6 +140,9 @@ interface MobileListInstance {
  *
  * @property addressSid - The SID of the Address resource associated with the phone number
  * @property apiVersion - The API version to use for incoming calls made to the new phone number
+ * @property bundleSid - The SID of the Bundle resource associated with number
+ * @property emergencyAddressSid - The emergency address configuration to use for emergency calling
+ * @property emergencyStatus - Status determining whether the new phone number is enabled for emergency calling
  * @property friendlyName - A string to describe the new phone number
  * @property identitySid - The SID of the Identity resource to associate with the new phone number
  * @property phoneNumber - The phone number to purchase in E.164 format
@@ -100,16 +153,21 @@ interface MobileListInstance {
  * @property smsUrl - The URL we should call when the new phone number receives an incoming SMS message
  * @property statusCallback - The URL we should call to send status information to your application
  * @property statusCallbackMethod - The HTTP method we should use to call status_callback
+ * @property trunkSid - SID of the trunk to handle calls to the new phone number
  * @property voiceApplicationSid - The SID of the application to handle the new phone number
  * @property voiceCallerIdLookup - Whether to lookup the caller's name
  * @property voiceFallbackMethod - The HTTP method used with voice_fallback_url
  * @property voiceFallbackUrl - The URL we will call when an error occurs in TwiML
  * @property voiceMethod - The HTTP method used with the voice_url
+ * @property voiceReceiveMode - Incoming call type: fax or voice
  * @property voiceUrl - The URL we should call when the phone number receives a call
  */
 interface MobileListInstanceCreateOptions {
   addressSid?: string;
   apiVersion?: string;
+  bundleSid?: string;
+  emergencyAddressSid?: string;
+  emergencyStatus?: MobileEmergencyStatus;
   friendlyName?: string;
   identitySid?: string;
   phoneNumber: string;
@@ -120,11 +178,13 @@ interface MobileListInstanceCreateOptions {
   smsUrl?: string;
   statusCallback?: string;
   statusCallbackMethod?: string;
+  trunkSid?: string;
   voiceApplicationSid?: string;
   voiceCallerIdLookup?: boolean;
   voiceFallbackMethod?: string;
   voiceFallbackUrl?: string;
   voiceMethod?: string;
+  voiceReceiveMode?: MobileVoiceReceiveMode;
   voiceUrl?: string;
 }
 
@@ -218,9 +278,12 @@ interface MobileResource {
   address_sid: string;
   api_version: string;
   beta: boolean;
-  capabilities: string;
+  bundle_sid: string;
+  capabilities: PhoneNumberCapabilities;
   date_created: Date;
   date_updated: Date;
+  emergency_address_sid: string;
+  emergency_status: MobileEmergencyStatus;
   friendly_name: string;
   identity_sid: string;
   origin: string;
@@ -231,6 +294,7 @@ interface MobileResource {
   sms_fallback_url: string;
   sms_method: string;
   sms_url: string;
+  status: string;
   status_callback: string;
   status_callback_method: string;
   trunk_sid: string;
@@ -240,6 +304,7 @@ interface MobileResource {
   voice_fallback_method: string;
   voice_fallback_url: string;
   voice_method: string;
+  voice_receive_mode: MobileVoiceReceiveMode;
   voice_url: string;
 }
 
@@ -263,9 +328,12 @@ declare class MobileInstance extends SerializableClass {
   addressSid: string;
   apiVersion: string;
   beta: boolean;
-  capabilities: string;
+  bundleSid: string;
+  capabilities: PhoneNumberCapabilities;
   dateCreated: Date;
   dateUpdated: Date;
+  emergencyAddressSid: string;
+  emergencyStatus: MobileEmergencyStatus;
   friendlyName: string;
   identitySid: string;
   origin: string;
@@ -276,6 +344,7 @@ declare class MobileInstance extends SerializableClass {
   smsFallbackUrl: string;
   smsMethod: string;
   smsUrl: string;
+  status: string;
   statusCallback: string;
   statusCallbackMethod: string;
   /**
@@ -289,6 +358,7 @@ declare class MobileInstance extends SerializableClass {
   voiceFallbackMethod: string;
   voiceFallbackUrl: string;
   voiceMethod: string;
+  voiceReceiveMode: MobileVoiceReceiveMode;
   voiceUrl: string;
 }
 
@@ -315,4 +385,4 @@ declare class MobilePage extends Page<V2010, MobilePayload, MobileResource, Mobi
   toJSON(): any;
 }
 
-export { MobileInstance, MobileList, MobileListInstance, MobileListInstanceCreateOptions, MobileListInstanceEachOptions, MobileListInstanceOptions, MobileListInstancePageOptions, MobilePage, MobilePayload, MobileResource, MobileSolution }
+export { MobileAddressRequirement, MobileEmergencyStatus, MobileInstance, MobileList, MobileListInstance, MobileListInstanceCreateOptions, MobileListInstanceEachOptions, MobileListInstanceOptions, MobileListInstancePageOptions, MobilePage, MobilePayload, MobileResource, MobileSolution, MobileVoiceReceiveMode }

@@ -510,13 +510,13 @@ DocumentInstance = function DocumentInstance(version, payload, serviceSid, sid)
 
 Object.defineProperty(DocumentInstance.prototype,
   '_proxy', {
-  get: function() {
-    if (!this._context) {
-      this._context = new DocumentContext(this._version, this._solution.serviceSid, this._solution.sid);
-    }
+    get: function() {
+      if (!this._context) {
+        this._context = new DocumentContext(this._version, this._solution.serviceSid, this._solution.sid);
+      }
 
-    return this._context;
-  }
+      return this._context;
+    }
 });
 
 /* jshint ignore:start */
@@ -542,13 +542,15 @@ DocumentInstance.prototype.fetch = function fetch(callback) {
  * @function remove
  * @memberof Twilio.Preview.Sync.ServiceContext.DocumentInstance#
  *
+ * @param {object} [opts] - Options for request
+ * @param {string} [opts.ifMatch] - The If-Match HTTP request header
  * @param {function} [callback] - Callback to handle processed record
  *
  * @returns {Promise} Resolves to processed DocumentInstance
  */
 /* jshint ignore:end */
-DocumentInstance.prototype.remove = function remove(callback) {
-  return this._proxy.remove(callback);
+DocumentInstance.prototype.remove = function remove(opts, callback) {
+  return this._proxy.remove(opts, callback);
 };
 
 /* jshint ignore:start */
@@ -560,6 +562,7 @@ DocumentInstance.prototype.remove = function remove(callback) {
  *
  * @param {object} opts - Options for request
  * @param {object} opts.data - The data
+ * @param {string} [opts.ifMatch] - The If-Match HTTP request header
  * @param {function} [callback] - Callback to handle processed record
  *
  * @returns {Promise} Resolves to processed DocumentInstance
@@ -682,14 +685,24 @@ DocumentContext.prototype.fetch = function fetch(callback) {
  * @function remove
  * @memberof Twilio.Preview.Sync.ServiceContext.DocumentContext#
  *
+ * @param {object} [opts] - Options for request
+ * @param {string} [opts.ifMatch] - The If-Match HTTP request header
  * @param {function} [callback] - Callback to handle processed record
  *
  * @returns {Promise} Resolves to processed DocumentInstance
  */
 /* jshint ignore:end */
-DocumentContext.prototype.remove = function remove(callback) {
+DocumentContext.prototype.remove = function remove(opts, callback) {
+  if (_.isFunction(opts)) {
+    callback = opts;
+    opts = {};
+  }
+  opts = opts || {};
+
   var deferred = Q.defer();
-  var promise = this._version.remove({uri: this._uri, method: 'DELETE'});
+  var headers = values.of({'If-Match': _.get(opts, 'ifMatch')});
+
+  var promise = this._version.remove({uri: this._uri, method: 'DELETE', headers: headers});
 
   promise = promise.then(function(payload) {
     deferred.resolve(payload);
@@ -715,6 +728,7 @@ DocumentContext.prototype.remove = function remove(callback) {
  *
  * @param {object} opts - Options for request
  * @param {object} opts.data - The data
+ * @param {string} [opts.ifMatch] - The If-Match HTTP request header
  * @param {function} [callback] - Callback to handle processed record
  *
  * @returns {Promise} Resolves to processed DocumentInstance
@@ -730,8 +744,9 @@ DocumentContext.prototype.update = function update(opts, callback) {
 
   var deferred = Q.defer();
   var data = values.of({'Data': serialize.object(_.get(opts, 'data'))});
+  var headers = values.of({'If-Match': _.get(opts, 'ifMatch')});
 
-  var promise = this._version.update({uri: this._uri, method: 'POST', data: data});
+  var promise = this._version.update({uri: this._uri, method: 'POST', data: data, headers: headers});
 
   promise = promise.then(function(payload) {
     deferred.resolve(new DocumentInstance(
@@ -755,16 +770,16 @@ DocumentContext.prototype.update = function update(opts, callback) {
 
 Object.defineProperty(DocumentContext.prototype,
   'documentPermissions', {
-  get: function() {
-    if (!this._documentPermissions) {
-      this._documentPermissions = new DocumentPermissionList(
-        this._version,
-        this._solution.serviceSid,
-        this._solution.sid
-      );
+    get: function() {
+      if (!this._documentPermissions) {
+        this._documentPermissions = new DocumentPermissionList(
+          this._version,
+          this._solution.serviceSid,
+          this._solution.sid
+        );
+      }
+      return this._documentPermissions;
     }
-    return this._documentPermissions;
-  }
 });
 
 /* jshint ignore:start */

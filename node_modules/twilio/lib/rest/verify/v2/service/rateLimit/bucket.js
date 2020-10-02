@@ -26,9 +26,6 @@ var BucketContext;
 /**
  * Initialize the BucketList
  *
- * PLEASE NOTE that this class contains beta products that are subject to change.
- * Use them with caution.
- *
  * @constructor Twilio.Verify.V2.ServiceContext.RateLimitContext.BucketList
  *
  * @param {Twilio.Verify.V2} version - Version of the resource
@@ -400,9 +397,6 @@ BucketList = function BucketList(version, serviceSid, rateLimitSid) {
 /**
  * Initialize the BucketPage
  *
- * PLEASE NOTE that this class contains beta products that are subject to change.
- * Use them with caution.
- *
  * @constructor Twilio.Verify.V2.ServiceContext.RateLimitContext.BucketPage
  *
  * @param {V2} version - Version of the resource
@@ -472,9 +466,6 @@ BucketPage.prototype[util.inspect.custom] = function inspect(depth, options) {
 /**
  * Initialize the BucketContext
  *
- * PLEASE NOTE that this class contains beta products that are subject to change.
- * Use them with caution.
- *
  * @constructor Twilio.Verify.V2.ServiceContext.RateLimitContext.BucketInstance
  *
  * @property {string} sid - A string that uniquely identifies this Bucket.
@@ -521,18 +512,18 @@ BucketInstance = function BucketInstance(version, payload, serviceSid,
 
 Object.defineProperty(BucketInstance.prototype,
   '_proxy', {
-  get: function() {
-    if (!this._context) {
-      this._context = new BucketContext(
-        this._version,
-        this._solution.serviceSid,
-        this._solution.rateLimitSid,
-        this._solution.sid
-      );
-    }
+    get: function() {
+      if (!this._context) {
+        this._context = new BucketContext(
+          this._version,
+          this._solution.serviceSid,
+          this._solution.rateLimitSid,
+          this._solution.sid
+        );
+      }
 
-    return this._context;
-  }
+      return this._context;
+    }
 });
 
 /* jshint ignore:start */
@@ -616,9 +607,6 @@ BucketInstance.prototype[util.inspect.custom] = function inspect(depth, options)
 /* jshint ignore:start */
 /**
  * Initialize the BucketContext
- *
- * PLEASE NOTE that this class contains beta products that are subject to change.
- * Use them with caution.
  *
  * @constructor Twilio.Verify.V2.ServiceContext.RateLimitContext.BucketContext
  *

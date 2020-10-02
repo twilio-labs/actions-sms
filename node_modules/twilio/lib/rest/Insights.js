@@ -21,7 +21,7 @@ var V1 = require('./insights/V1');  /* jshint ignore:line */
  * @constructor Twilio.Insights
  *
  * @property {Twilio.Insights.V1} v1 - v1 version
- * @property {Twilio.Insights.V1.CallSummaryList} summary - summary resource
+ * @property {Twilio.Insights.V1.CallList} calls - calls resource
  *
  * @param {Twilio} twilio - The twilio client
  */
@@ -38,17 +38,17 @@ Insights.prototype.constructor = Insights;
 
 Object.defineProperty(Insights.prototype,
   'v1', {
-  get: function() {
-    this._v1 = this._v1 || new V1(this);
-    return this._v1;
-  }
+    get: function() {
+      this._v1 = this._v1 || new V1(this);
+      return this._v1;
+    }
 });
 
 Object.defineProperty(Insights.prototype,
-  'summary', {
-  get: function() {
-    return this.v1.summary;
-  }
+  'calls', {
+    get: function() {
+      return this.v1.calls;
+    }
 });
 
 module.exports = Insights;

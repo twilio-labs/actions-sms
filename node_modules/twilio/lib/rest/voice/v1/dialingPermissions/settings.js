@@ -167,7 +167,7 @@ SettingsPage.prototype[util.inspect.custom] = function inspect(depth, options) {
  * @constructor Twilio.Voice.V1.DialingPermissionsContext.SettingsInstance
  *
  * @property {boolean} dialingPermissionsInheritance -
- *          `true` if this sub-account will inherit voice dialing permissions from the Master Project; otherwise `false`
+ *          `true` if the sub-account will inherit voice dialing permissions from the Master Project; otherwise `false`
  * @property {string} url - The absolute URL of this resource
  *
  * @param {V1} version - Version of the resource
@@ -188,13 +188,13 @@ SettingsInstance = function SettingsInstance(version, payload) {
 
 Object.defineProperty(SettingsInstance.prototype,
   '_proxy', {
-  get: function() {
-    if (!this._context) {
-      this._context = new SettingsContext(this._version);
-    }
+    get: function() {
+      if (!this._context) {
+        this._context = new SettingsContext(this._version);
+      }
 
-    return this._context;
-  }
+      return this._context;
+    }
 });
 
 /* jshint ignore:start */
@@ -222,7 +222,7 @@ SettingsInstance.prototype.fetch = function fetch(callback) {
  *
  * @param {object} [opts] - Options for request
  * @param {boolean} [opts.dialingPermissionsInheritance] -
- *          `true` for this sub-account to inherit voice dialing permissions from the Master Project; otherwise `false`
+ *          `true` for the sub-account to inherit voice dialing permissions from the Master Project; otherwise `false`
  * @param {function} [callback] - Callback to handle processed record
  *
  * @returns {Promise} Resolves to processed SettingsInstance
@@ -319,7 +319,7 @@ SettingsContext.prototype.fetch = function fetch(callback) {
  *
  * @param {object} [opts] - Options for request
  * @param {boolean} [opts.dialingPermissionsInheritance] -
- *          `true` for this sub-account to inherit voice dialing permissions from the Master Project; otherwise `false`
+ *          `true` for the sub-account to inherit voice dialing permissions from the Master Project; otherwise `false`
  * @param {function} [callback] - Callback to handle processed record
  *
  * @returns {Promise} Resolves to processed SettingsInstance

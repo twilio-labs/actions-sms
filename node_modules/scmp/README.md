@@ -14,14 +14,6 @@
 
 Safe, constant-time comparison of Buffers.
 
-## Changes in v2.x
-Since scmp 2.x, Buffers are now required to be passed as arguments. In 1.x,
-the arguments were assumed to be strings, and were always run through `String()`.
-
-Also, there is a new `crypto.timingSafeEqual()` since Node v6.6.0. If this function
-is available, then that will be used, otherwise a scmp-internal implementation
-will be used.
-
 ## Install
 
 ```

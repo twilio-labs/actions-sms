@@ -325,6 +325,12 @@ DomainList = function DomainList(version, accountSid) {
    * @param {string} [opts.voiceStatusCallbackMethod] -
    *          The HTTP method we should use to call `voice_status_callback_url`
    * @param {boolean} [opts.sipRegistration] - Whether SIP registration is allowed
+   * @param {boolean} [opts.emergencyCallingEnabled] -
+   *          Whether emergency calling is enabled for the domain.
+   * @param {boolean} [opts.secure] - Whether secure SIP is enabled for the domain
+   * @param {string} [opts.byocTrunkSid] - The SID of the BYOC Trunk resource.
+   * @param {string} [opts.emergencyCallerSid] -
+   *          Whether an emergency caller sid is configured for the domain.
    * @param {function} [callback] - Callback to handle processed record
    *
    * @returns {Promise} Resolves to processed DomainInstance
@@ -348,7 +354,11 @@ DomainList = function DomainList(version, accountSid) {
       'VoiceFallbackMethod': _.get(opts, 'voiceFallbackMethod'),
       'VoiceStatusCallbackUrl': _.get(opts, 'voiceStatusCallbackUrl'),
       'VoiceStatusCallbackMethod': _.get(opts, 'voiceStatusCallbackMethod'),
-      'SipRegistration': serialize.bool(_.get(opts, 'sipRegistration'))
+      'SipRegistration': serialize.bool(_.get(opts, 'sipRegistration')),
+      'EmergencyCallingEnabled': serialize.bool(_.get(opts, 'emergencyCallingEnabled')),
+      'Secure': serialize.bool(_.get(opts, 'secure')),
+      'ByocTrunkSid': _.get(opts, 'byocTrunkSid'),
+      'EmergencyCallerSid': _.get(opts, 'emergencyCallerSid')
     });
 
     var promise = this._version.create({uri: this._uri, method: 'POST', data: data});
@@ -508,6 +518,12 @@ DomainPage.prototype[util.inspect.custom] = function inspect(depth, options) {
  * @property {string} subresourceUris -
  *          A list mapping resources associated with the SIP Domain resource
  * @property {boolean} sipRegistration - Whether SIP registration is allowed
+ * @property {boolean} emergencyCallingEnabled -
+ *          Whether emergency calling is enabled for the domain.
+ * @property {boolean} secure - Whether secure SIP is enabled for the domain
+ * @property {string} byocTrunkSid - The SID of the BYOC Trunk resource.
+ * @property {string} emergencyCallerSid -
+ *          Whether an emergency caller sid is configured for the domain.
  *
  * @param {V2010} version - Version of the resource
  * @param {DomainPayload} payload - The instance payload
@@ -537,6 +553,10 @@ DomainInstance = function DomainInstance(version, payload, accountSid, sid) {
   this.voiceUrl = payload.voice_url; // jshint ignore:line
   this.subresourceUris = payload.subresource_uris; // jshint ignore:line
   this.sipRegistration = payload.sip_registration; // jshint ignore:line
+  this.emergencyCallingEnabled = payload.emergency_calling_enabled; // jshint ignore:line
+  this.secure = payload.secure; // jshint ignore:line
+  this.byocTrunkSid = payload.byoc_trunk_sid; // jshint ignore:line
+  this.emergencyCallerSid = payload.emergency_caller_sid; // jshint ignore:line
 
   // Context
   this._context = undefined;
@@ -545,13 +565,13 @@ DomainInstance = function DomainInstance(version, payload, accountSid, sid) {
 
 Object.defineProperty(DomainInstance.prototype,
   '_proxy', {
-  get: function() {
-    if (!this._context) {
-      this._context = new DomainContext(this._version, this._solution.accountSid, this._solution.sid);
-    }
+    get: function() {
+      if (!this._context) {
+        this._context = new DomainContext(this._version, this._solution.accountSid, this._solution.sid);
+      }
 
-    return this._context;
-  }
+      return this._context;
+    }
 });
 
 /* jshint ignore:start */
@@ -593,6 +613,12 @@ DomainInstance.prototype.fetch = function fetch(callback) {
  * @param {boolean} [opts.sipRegistration] - Whether SIP registration is allowed
  * @param {string} [opts.domainName] -
  *          The unique address on Twilio to route SIP traffic
+ * @param {boolean} [opts.emergencyCallingEnabled] -
+ *          Whether emergency calling is enabled for the domain.
+ * @param {boolean} [opts.secure] - Whether secure SIP is enabled for the domain
+ * @param {string} [opts.byocTrunkSid] - The SID of the BYOC Trunk resource.
+ * @param {string} [opts.emergencyCallerSid] -
+ *          Whether an emergency caller sid is configured for the domain.
  * @param {function} [callback] - Callback to handle processed record
  *
  * @returns {Promise} Resolves to processed DomainInstance
@@ -779,6 +805,12 @@ DomainContext.prototype.fetch = function fetch(callback) {
  * @param {boolean} [opts.sipRegistration] - Whether SIP registration is allowed
  * @param {string} [opts.domainName] -
  *          The unique address on Twilio to route SIP traffic
+ * @param {boolean} [opts.emergencyCallingEnabled] -
+ *          Whether emergency calling is enabled for the domain.
+ * @param {boolean} [opts.secure] - Whether secure SIP is enabled for the domain
+ * @param {string} [opts.byocTrunkSid] - The SID of the BYOC Trunk resource.
+ * @param {string} [opts.emergencyCallerSid] -
+ *          Whether an emergency caller sid is configured for the domain.
  * @param {function} [callback] - Callback to handle processed record
  *
  * @returns {Promise} Resolves to processed DomainInstance
@@ -801,7 +833,11 @@ DomainContext.prototype.update = function update(opts, callback) {
     'VoiceStatusCallbackUrl': _.get(opts, 'voiceStatusCallbackUrl'),
     'VoiceUrl': _.get(opts, 'voiceUrl'),
     'SipRegistration': serialize.bool(_.get(opts, 'sipRegistration')),
-    'DomainName': _.get(opts, 'domainName')
+    'DomainName': _.get(opts, 'domainName'),
+    'EmergencyCallingEnabled': serialize.bool(_.get(opts, 'emergencyCallingEnabled')),
+    'Secure': serialize.bool(_.get(opts, 'secure')),
+    'ByocTrunkSid': _.get(opts, 'byocTrunkSid'),
+    'EmergencyCallerSid': _.get(opts, 'emergencyCallerSid')
   });
 
   var promise = this._version.update({uri: this._uri, method: 'POST', data: data});
@@ -859,40 +895,40 @@ DomainContext.prototype.remove = function remove(callback) {
 
 Object.defineProperty(DomainContext.prototype,
   'ipAccessControlListMappings', {
-  get: function() {
-    if (!this._ipAccessControlListMappings) {
-      this._ipAccessControlListMappings = new IpAccessControlListMappingList(
-        this._version,
-        this._solution.accountSid,
-        this._solution.sid
-      );
+    get: function() {
+      if (!this._ipAccessControlListMappings) {
+        this._ipAccessControlListMappings = new IpAccessControlListMappingList(
+          this._version,
+          this._solution.accountSid,
+          this._solution.sid
+        );
+      }
+      return this._ipAccessControlListMappings;
     }
-    return this._ipAccessControlListMappings;
-  }
 });
 
 Object.defineProperty(DomainContext.prototype,
   'credentialListMappings', {
-  get: function() {
-    if (!this._credentialListMappings) {
-      this._credentialListMappings = new CredentialListMappingList(
-        this._version,
-        this._solution.accountSid,
-        this._solution.sid
-      );
+    get: function() {
+      if (!this._credentialListMappings) {
+        this._credentialListMappings = new CredentialListMappingList(
+          this._version,
+          this._solution.accountSid,
+          this._solution.sid
+        );
+      }
+      return this._credentialListMappings;
     }
-    return this._credentialListMappings;
-  }
 });
 
 Object.defineProperty(DomainContext.prototype,
   'auth', {
-  get: function() {
-    if (!this._auth) {
-      this._auth = new AuthTypesList(this._version, this._solution.accountSid, this._solution.sid);
+    get: function() {
+      if (!this._auth) {
+        this._auth = new AuthTypesList(this._version, this._solution.accountSid, this._solution.sid);
+      }
+      return this._auth;
     }
-    return this._auth;
-  }
 });
 
 /* jshint ignore:start */

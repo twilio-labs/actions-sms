@@ -560,18 +560,18 @@ SyncListItemInstance = function SyncListItemInstance(version, payload,
 
 Object.defineProperty(SyncListItemInstance.prototype,
   '_proxy', {
-  get: function() {
-    if (!this._context) {
-      this._context = new SyncListItemContext(
-        this._version,
-        this._solution.serviceSid,
-        this._solution.listSid,
-        this._solution.index
-      );
-    }
+    get: function() {
+      if (!this._context) {
+        this._context = new SyncListItemContext(
+          this._version,
+          this._solution.serviceSid,
+          this._solution.listSid,
+          this._solution.index
+        );
+      }
 
-    return this._context;
-  }
+      return this._context;
+    }
 });
 
 /* jshint ignore:start */
@@ -597,13 +597,15 @@ SyncListItemInstance.prototype.fetch = function fetch(callback) {
  * @function remove
  * @memberof Twilio.Sync.V1.ServiceContext.SyncListContext.SyncListItemInstance#
  *
+ * @param {object} [opts] - Options for request
+ * @param {string} [opts.ifMatch] - The If-Match HTTP request header
  * @param {function} [callback] - Callback to handle processed record
  *
  * @returns {Promise} Resolves to processed SyncListItemInstance
  */
 /* jshint ignore:end */
-SyncListItemInstance.prototype.remove = function remove(callback) {
-  return this._proxy.remove(callback);
+SyncListItemInstance.prototype.remove = function remove(opts, callback) {
+  return this._proxy.remove(opts, callback);
 };
 
 /* jshint ignore:start */
@@ -621,6 +623,7 @@ SyncListItemInstance.prototype.remove = function remove(callback) {
  *          How long, in seconds, before the List Item expires
  * @param {number} [opts.collectionTtl] -
  *          How long, in seconds, before the List Item's parent Sync List expires
+ * @param {string} [opts.ifMatch] - The If-Match HTTP request header
  * @param {function} [callback] - Callback to handle processed record
  *
  * @returns {Promise} Resolves to processed SyncListItemInstance
@@ -726,14 +729,24 @@ SyncListItemContext.prototype.fetch = function fetch(callback) {
  * @function remove
  * @memberof Twilio.Sync.V1.ServiceContext.SyncListContext.SyncListItemContext#
  *
+ * @param {object} [opts] - Options for request
+ * @param {string} [opts.ifMatch] - The If-Match HTTP request header
  * @param {function} [callback] - Callback to handle processed record
  *
  * @returns {Promise} Resolves to processed SyncListItemInstance
  */
 /* jshint ignore:end */
-SyncListItemContext.prototype.remove = function remove(callback) {
+SyncListItemContext.prototype.remove = function remove(opts, callback) {
+  if (_.isFunction(opts)) {
+    callback = opts;
+    opts = {};
+  }
+  opts = opts || {};
+
   var deferred = Q.defer();
-  var promise = this._version.remove({uri: this._uri, method: 'DELETE'});
+  var headers = values.of({'If-Match': _.get(opts, 'ifMatch')});
+
+  var promise = this._version.remove({uri: this._uri, method: 'DELETE', headers: headers});
 
   promise = promise.then(function(payload) {
     deferred.resolve(payload);
@@ -765,6 +778,7 @@ SyncListItemContext.prototype.remove = function remove(callback) {
  *          How long, in seconds, before the List Item expires
  * @param {number} [opts.collectionTtl] -
  *          How long, in seconds, before the List Item's parent Sync List expires
+ * @param {string} [opts.ifMatch] - The If-Match HTTP request header
  * @param {function} [callback] - Callback to handle processed record
  *
  * @returns {Promise} Resolves to processed SyncListItemInstance
@@ -784,8 +798,9 @@ SyncListItemContext.prototype.update = function update(opts, callback) {
     'ItemTtl': _.get(opts, 'itemTtl'),
     'CollectionTtl': _.get(opts, 'collectionTtl')
   });
+  var headers = values.of({'If-Match': _.get(opts, 'ifMatch')});
 
-  var promise = this._version.update({uri: this._uri, method: 'POST', data: data});
+  var promise = this._version.update({uri: this._uri, method: 'POST', data: data, headers: headers});
 
   promise = promise.then(function(payload) {
     deferred.resolve(new SyncListItemInstance(

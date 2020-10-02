@@ -27,9 +27,6 @@ var VerificationContext;
 /**
  * Initialize the VerificationList
  *
- * PLEASE NOTE that this class contains beta products that are subject to change.
- * Use them with caution.
- *
  * @constructor Twilio.Verify.V2.ServiceContext.VerificationList
  *
  * @param {Twilio.Verify.V2} version - Version of the resource
@@ -64,8 +61,9 @@ VerificationList = function VerificationList(version, serviceSid) {
    * @memberof Twilio.Verify.V2.ServiceContext.VerificationList#
    *
    * @param {object} opts - Options for request
-   * @param {string} opts.to - The phone number to verify
+   * @param {string} opts.to - The phone number or email to verify
    * @param {string} opts.channel - The verification method to use
+   * @param {string} [opts.customFriendlyName] - A custom user defined friendly name
    * @param {string} [opts.customMessage] -
    *          The text of a custom message to use for the verification
    * @param {string} [opts.sendDigits] -
@@ -79,6 +77,10 @@ VerificationList = function VerificationList(version, serviceSid) {
    *          The payee of the associated PSD2 compliant transaction
    * @param {object} [opts.rateLimits] -
    *          The custom key-value pairs of Programmable Rate Limits.
+   * @param {object} [opts.channelConfiguration] -
+   *          Channel specific configuration in json format.
+   * @param {string} [opts.appHash] -
+   *          Your App Hash to be appended at the end of an SMS.
    * @param {function} [callback] - Callback to handle processed record
    *
    * @returns {Promise} Resolves to processed VerificationInstance
@@ -99,13 +101,16 @@ VerificationList = function VerificationList(version, serviceSid) {
     var data = values.of({
       'To': _.get(opts, 'to'),
       'Channel': _.get(opts, 'channel'),
+      'CustomFriendlyName': _.get(opts, 'customFriendlyName'),
       'CustomMessage': _.get(opts, 'customMessage'),
       'SendDigits': _.get(opts, 'sendDigits'),
       'Locale': _.get(opts, 'locale'),
       'CustomCode': _.get(opts, 'customCode'),
       'Amount': _.get(opts, 'amount'),
       'Payee': _.get(opts, 'payee'),
-      'RateLimits': serialize.object(_.get(opts, 'rateLimits'))
+      'RateLimits': serialize.object(_.get(opts, 'rateLimits')),
+      'ChannelConfiguration': serialize.object(_.get(opts, 'channelConfiguration')),
+      'AppHash': _.get(opts, 'appHash')
     });
 
     var promise = this._version.create({uri: this._uri, method: 'POST', data: data});
@@ -173,9 +178,6 @@ VerificationList = function VerificationList(version, serviceSid) {
 /**
  * Initialize the VerificationPage
  *
- * PLEASE NOTE that this class contains beta products that are subject to change.
- * Use them with caution.
- *
  * @constructor Twilio.Verify.V2.ServiceContext.VerificationPage
  *
  * @param {V2} version - Version of the resource
@@ -241,17 +243,14 @@ VerificationPage.prototype[util.inspect.custom] = function inspect(depth,
 /**
  * Initialize the VerificationContext
  *
- * PLEASE NOTE that this class contains beta products that are subject to change.
- * Use them with caution.
- *
  * @constructor Twilio.Verify.V2.ServiceContext.VerificationInstance
  *
  * @property {string} sid - The unique string that identifies the resource
  * @property {string} serviceSid -
  *          The SID of the Service that the resource is associated with
  * @property {string} accountSid - The SID of the Account that created the resource
- * @property {string} to - The phone number being verified
- * @property {verification.channel} channel - The verification method to use
+ * @property {string} to - The phone number or email being verified
+ * @property {verification.channel} channel - The verification method used.
  * @property {string} status - The status of the verification resource
  * @property {boolean} valid - Whether the verification was successful
  * @property {object} lookup - Information about the phone number being verified
@@ -259,6 +258,7 @@ VerificationPage.prototype[util.inspect.custom] = function inspect(depth,
  *          The amount of the associated PSD2 compliant transaction.
  * @property {string} payee -
  *          The payee of the associated PSD2 compliant transaction
+ * @property {object} sendCodeAttempts - An array of verification attempt objects.
  * @property {Date} dateCreated -
  *          The RFC 2822 date and time in GMT when the resource was created
  * @property {Date} dateUpdated -
@@ -287,6 +287,7 @@ VerificationInstance = function VerificationInstance(version, payload,
   this.lookup = payload.lookup; // jshint ignore:line
   this.amount = payload.amount; // jshint ignore:line
   this.payee = payload.payee; // jshint ignore:line
+  this.sendCodeAttempts = payload.send_code_attempts; // jshint ignore:line
   this.dateCreated = deserialize.iso8601DateTime(payload.date_created); // jshint ignore:line
   this.dateUpdated = deserialize.iso8601DateTime(payload.date_updated); // jshint ignore:line
   this.url = payload.url; // jshint ignore:line
@@ -298,17 +299,17 @@ VerificationInstance = function VerificationInstance(version, payload,
 
 Object.defineProperty(VerificationInstance.prototype,
   '_proxy', {
-  get: function() {
-    if (!this._context) {
-      this._context = new VerificationContext(
-        this._version,
-        this._solution.serviceSid,
-        this._solution.sid
-      );
-    }
+    get: function() {
+      if (!this._context) {
+        this._context = new VerificationContext(
+          this._version,
+          this._solution.serviceSid,
+          this._solution.sid
+        );
+      }
 
-    return this._context;
-  }
+      return this._context;
+    }
 });
 
 /* jshint ignore:start */
@@ -374,9 +375,6 @@ VerificationInstance.prototype[util.inspect.custom] = function inspect(depth,
 /* jshint ignore:start */
 /**
  * Initialize the VerificationContext
- *
- * PLEASE NOTE that this class contains beta products that are subject to change.
- * Use them with caution.
  *
  * @constructor Twilio.Verify.V2.ServiceContext.VerificationContext
  *

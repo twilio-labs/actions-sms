@@ -21,9 +21,15 @@ var V1 = require('./conversations/V1');  /* jshint ignore:line */
  * @constructor Twilio.Conversations
  *
  * @property {Twilio.Conversations.V1} v1 - v1 version
+ * @property {Twilio.Conversations.V1.ConfigurationList} configuration -
+ *          configuration resource
  * @property {Twilio.Conversations.V1.ConversationList} conversations -
  *          conversations resource
- * @property {Twilio.Conversations.V1.WebhookList} webhooks - webhooks resource
+ * @property {Twilio.Conversations.V1.CredentialList} credentials -
+ *          credentials resource
+ * @property {Twilio.Conversations.V1.RoleList} roles - roles resource
+ * @property {Twilio.Conversations.V1.ServiceList} services - services resource
+ * @property {Twilio.Conversations.V1.UserList} users - users resource
  *
  * @param {Twilio} twilio - The twilio client
  */
@@ -40,24 +46,52 @@ Conversations.prototype.constructor = Conversations;
 
 Object.defineProperty(Conversations.prototype,
   'v1', {
-  get: function() {
-    this._v1 = this._v1 || new V1(this);
-    return this._v1;
-  }
+    get: function() {
+      this._v1 = this._v1 || new V1(this);
+      return this._v1;
+    }
+});
+
+Object.defineProperty(Conversations.prototype,
+  'configuration', {
+    get: function() {
+      return this.v1.configuration;
+    }
 });
 
 Object.defineProperty(Conversations.prototype,
   'conversations', {
-  get: function() {
-    return this.v1.conversations;
-  }
+    get: function() {
+      return this.v1.conversations;
+    }
 });
 
 Object.defineProperty(Conversations.prototype,
-  'webhooks', {
-  get: function() {
-    return this.v1.webhooks;
-  }
+  'credentials', {
+    get: function() {
+      return this.v1.credentials;
+    }
+});
+
+Object.defineProperty(Conversations.prototype,
+  'roles', {
+    get: function() {
+      return this.v1.roles;
+    }
+});
+
+Object.defineProperty(Conversations.prototype,
+  'services', {
+    get: function() {
+      return this.v1.services;
+    }
+});
+
+Object.defineProperty(Conversations.prototype,
+  'users', {
+    get: function() {
+      return this.v1.users;
+    }
 });
 
 module.exports = Conversations;

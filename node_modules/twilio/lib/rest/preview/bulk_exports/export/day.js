@@ -20,6 +20,7 @@ var values = require('../../../../base/values');  /* jshint ignore:line */
 var DayList;
 var DayPage;
 var DayInstance;
+var DayContext;
 
 /* jshint ignore:start */
 /**
@@ -32,7 +33,7 @@ var DayInstance;
  * @constructor Twilio.Preview.BulkExports.ExportContext.DayList
  *
  * @param {Twilio.Preview.BulkExports} version - Version of the resource
- * @param {string} resourceType - The resource_type
+ * @param {string} resourceType - The type of communication – Messages, Calls
  */
 /* jshint ignore:end */
 DayList = function DayList(version, resourceType) {
@@ -71,6 +72,8 @@ DayList = function DayList(version, resourceType) {
    * @memberof Twilio.Preview.BulkExports.ExportContext.DayList#
    *
    * @param {object} [opts] - Options for request
+   * @param {string} [opts.nextToken] - The next_token
+   * @param {string} [opts.previousToken] - The previous_token
    * @param {number} [opts.limit] -
    *         Upper limit for the number of records to return.
    *         each() guarantees never to return more than limit.
@@ -160,6 +163,8 @@ DayList = function DayList(version, resourceType) {
    * @memberof Twilio.Preview.BulkExports.ExportContext.DayList#
    *
    * @param {object} [opts] - Options for request
+   * @param {string} [opts.nextToken] - The next_token
+   * @param {string} [opts.previousToken] - The previous_token
    * @param {number} [opts.limit] -
    *         Upper limit for the number of records to return.
    *         list() guarantees never to return more than limit.
@@ -220,6 +225,8 @@ DayList = function DayList(version, resourceType) {
    * @memberof Twilio.Preview.BulkExports.ExportContext.DayList#
    *
    * @param {object} [opts] - Options for request
+   * @param {string} [opts.nextToken] - The next_token
+   * @param {string} [opts.previousToken] - The previous_token
    * @param {string} [opts.pageToken] - PageToken provided by the API
    * @param {number} [opts.pageNumber] -
    *          Page Number, this value is simply for client state
@@ -238,6 +245,8 @@ DayList = function DayList(version, resourceType) {
 
     var deferred = Q.defer();
     var data = values.of({
+      'NextToken': _.get(opts, 'nextToken'),
+      'PreviousToken': _.get(opts, 'previousToken'),
       'PageToken': opts.pageToken,
       'Page': opts.pageNumber,
       'PageSize': opts.pageSize
@@ -296,6 +305,22 @@ DayList = function DayList(version, resourceType) {
     }
 
     return deferred.promise;
+  };
+
+  /* jshint ignore:start */
+  /**
+   * Constructs a day
+   *
+   * @function get
+   * @memberof Twilio.Preview.BulkExports.ExportContext.DayList#
+   *
+   * @param {string} day - The date of the data in the file
+   *
+   * @returns {Twilio.Preview.BulkExports.ExportContext.DayContext}
+   */
+  /* jshint ignore:end */
+  DayListInstance.get = function get(day) {
+    return new DayContext(this._version, this._solution.resourceType, day);
   };
 
   /* jshint ignore:start */
@@ -399,27 +424,60 @@ DayPage.prototype[util.inspect.custom] = function inspect(depth, options) {
  * @constructor Twilio.Preview.BulkExports.ExportContext.DayInstance
  *
  * @property {string} redirectTo - The redirect_to
- * @property {string} day - The day
- * @property {number} size - The size
- * @property {string} resourceType - The resource_type
+ * @property {string} day - The date of the data in the file
+ * @property {number} size - Size of the file in bytes
+ * @property {string} createDate - The date when resource is created
+ * @property {string} friendlyName -
+ *          The friendly name specified when creating the job
+ * @property {string} resourceType - The type of communication – Messages, Calls
  *
  * @param {BulkExports} version - Version of the resource
  * @param {DayPayload} payload - The instance payload
- * @param {string} resourceType - The resource_type
+ * @param {string} resourceType - The type of communication – Messages, Calls
+ * @param {string} day - The date of the data in the file
  */
 /* jshint ignore:end */
-DayInstance = function DayInstance(version, payload, resourceType) {
+DayInstance = function DayInstance(version, payload, resourceType, day) {
   this._version = version;
 
   // Marshaled Properties
   this.redirectTo = payload.redirect_to; // jshint ignore:line
   this.day = payload.day; // jshint ignore:line
   this.size = deserialize.integer(payload.size); // jshint ignore:line
+  this.createDate = payload.create_date; // jshint ignore:line
+  this.friendlyName = payload.friendly_name; // jshint ignore:line
   this.resourceType = payload.resource_type; // jshint ignore:line
 
   // Context
   this._context = undefined;
-  this._solution = {resourceType: resourceType, };
+  this._solution = {resourceType: resourceType, day: day || this.day, };
+};
+
+Object.defineProperty(DayInstance.prototype,
+  '_proxy', {
+    get: function() {
+      if (!this._context) {
+        this._context = new DayContext(this._version, this._solution.resourceType, this._solution.day);
+      }
+
+      return this._context;
+    }
+});
+
+/* jshint ignore:start */
+/**
+ * fetch a DayInstance
+ *
+ * @function fetch
+ * @memberof Twilio.Preview.BulkExports.ExportContext.DayInstance#
+ *
+ * @param {function} [callback] - Callback to handle processed record
+ *
+ * @returns {Promise} Resolves to processed DayInstance
+ */
+/* jshint ignore:end */
+DayInstance.prototype.fetch = function fetch(callback) {
+  return this._proxy.fetch(callback);
 };
 
 /* jshint ignore:start */
@@ -446,8 +504,87 @@ DayInstance.prototype[util.inspect.custom] = function inspect(depth, options) {
   return util.inspect(this.toJSON(), options);
 };
 
+
+/* jshint ignore:start */
+/**
+ * Initialize the DayContext
+ *
+ * PLEASE NOTE that this class contains preview products that are subject to
+ * change. Use them with caution. If you currently do not have developer preview
+ * access, please contact help@twilio.com.
+ *
+ * @constructor Twilio.Preview.BulkExports.ExportContext.DayContext
+ *
+ * @param {BulkExports} version - Version of the resource
+ * @param {string} resourceType - The type of communication – Messages, Calls
+ * @param {string} day - The date of the data in the file
+ */
+/* jshint ignore:end */
+DayContext = function DayContext(version, resourceType, day) {
+  this._version = version;
+
+  // Path Solution
+  this._solution = {resourceType: resourceType, day: day, };
+  this._uri = `/Exports/${resourceType}/Days/${day}`;
+};
+
+/* jshint ignore:start */
+/**
+ * fetch a DayInstance
+ *
+ * @function fetch
+ * @memberof Twilio.Preview.BulkExports.ExportContext.DayContext#
+ *
+ * @param {function} [callback] - Callback to handle processed record
+ *
+ * @returns {Promise} Resolves to processed DayInstance
+ */
+/* jshint ignore:end */
+DayContext.prototype.fetch = function fetch(callback) {
+  var deferred = Q.defer();
+  var promise = this._version.fetch({uri: this._uri, method: 'GET'});
+
+  promise = promise.then(function(payload) {
+    deferred.resolve(new DayInstance(
+      this._version,
+      payload,
+      this._solution.resourceType,
+      this._solution.day
+    ));
+  }.bind(this));
+
+  promise.catch(function(error) {
+    deferred.reject(error);
+  });
+
+  if (_.isFunction(callback)) {
+    deferred.promise.nodeify(callback);
+  }
+
+  return deferred.promise;
+};
+
+/* jshint ignore:start */
+/**
+ * Provide a user-friendly representation
+ *
+ * @function toJSON
+ * @memberof Twilio.Preview.BulkExports.ExportContext.DayContext#
+ *
+ * @returns Object
+ */
+/* jshint ignore:end */
+DayContext.prototype.toJSON = function toJSON() {
+  return this._solution;
+};
+
+DayContext.prototype[util.inspect.custom] = function inspect(depth, options) {
+  return util.inspect(this.toJSON(), options);
+};
+
 module.exports = {
   DayList: DayList,
   DayPage: DayPage,
-  DayInstance: DayInstance
+  DayInstance: DayInstance,
+  DayContext: DayContext
 };

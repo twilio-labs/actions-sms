@@ -455,15 +455,16 @@ CountryPage.prototype[util.inspect.custom] = function inspect(depth, options) {
  * @constructor Twilio.Voice.V1.DialingPermissionsContext.CountryInstance
  *
  * @property {string} isoCode - The ISO country code
- * @property {string} name - Name of the country
- * @property {string} continent - Name of the continent
+ * @property {string} name - The name of the country
+ * @property {string} continent -
+ *          The name of the continent in which the country is located
  * @property {string} countryCodes - The E.164 assigned country codes(s)
  * @property {boolean} lowRiskNumbersEnabled -
- *          `true`, if dialing to low-risk numbers is enabled, else `false`
+ *          Whether dialing to low-risk numbers is enabled
  * @property {boolean} highRiskSpecialNumbersEnabled -
- *          `true`, if dialing to high-risk special services numbers is enabled, else `false`
+ *          Whether dialing to high-risk special services numbers is enabled
  * @property {boolean} highRiskTollfraudNumbersEnabled -
- *          `true`, if dialing to high-risk toll fraud numbers is enabled, else `false`
+ *          Whether dialing to high-risk toll fraud numbers is enabled, else `false`
  * @property {string} url - The absolute URL of this resource
  * @property {string} links - A list of URLs related to this resource
  *
@@ -493,13 +494,13 @@ CountryInstance = function CountryInstance(version, payload, isoCode) {
 
 Object.defineProperty(CountryInstance.prototype,
   '_proxy', {
-  get: function() {
-    if (!this._context) {
-      this._context = new CountryContext(this._version, this._solution.isoCode);
-    }
+    get: function() {
+      if (!this._context) {
+        this._context = new CountryContext(this._version, this._solution.isoCode);
+      }
 
-    return this._context;
-  }
+      return this._context;
+    }
 });
 
 /* jshint ignore:start */
@@ -620,15 +621,15 @@ CountryContext.prototype.fetch = function fetch(callback) {
 
 Object.defineProperty(CountryContext.prototype,
   'highriskSpecialPrefixes', {
-  get: function() {
-    if (!this._highriskSpecialPrefixes) {
-      this._highriskSpecialPrefixes = new HighriskSpecialPrefixList(
-        this._version,
-        this._solution.isoCode
-      );
+    get: function() {
+      if (!this._highriskSpecialPrefixes) {
+        this._highriskSpecialPrefixes = new HighriskSpecialPrefixList(
+          this._version,
+          this._solution.isoCode
+        );
+      }
+      return this._highriskSpecialPrefixes;
     }
-    return this._highriskSpecialPrefixes;
-  }
 });
 
 /* jshint ignore:start */

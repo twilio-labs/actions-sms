@@ -481,7 +481,8 @@ PhoneNumberPage.prototype[util.inspect.custom] = function inspect(depth,
  * @property {string} friendlyName -
  *          The string that you assigned to describe the resource
  * @property {string} isoCountry - The ISO Country Code
- * @property {string} capabilities - The capabilities of the phone number
+ * @property {PhoneNumberCapabilities} capabilities -
+ *          The capabilities of the phone number
  * @property {string} url - The absolute URL of the PhoneNumber resource
  * @property {boolean} isReserved -
  *          Reserve the phone number for manual assignment to participants only
@@ -519,17 +520,17 @@ PhoneNumberInstance = function PhoneNumberInstance(version, payload, serviceSid,
 
 Object.defineProperty(PhoneNumberInstance.prototype,
   '_proxy', {
-  get: function() {
-    if (!this._context) {
-      this._context = new PhoneNumberContext(
-        this._version,
-        this._solution.serviceSid,
-        this._solution.sid
-      );
-    }
+    get: function() {
+      if (!this._context) {
+        this._context = new PhoneNumberContext(
+          this._version,
+          this._solution.serviceSid,
+          this._solution.sid
+        );
+      }
 
-    return this._context;
-  }
+      return this._context;
+    }
 });
 
 /* jshint ignore:start */
