@@ -21,6 +21,7 @@ var V2 = require('./verify/V2');  /* jshint ignore:line */
  * @constructor Twilio.Verify
  *
  * @property {Twilio.Verify.V2} v2 - v2 version
+ * @property {Twilio.Verify.V2.FormList} forms - forms resource
  * @property {Twilio.Verify.V2.ServiceList} services - services resource
  *
  * @param {Twilio} twilio - The twilio client
@@ -38,17 +39,24 @@ Verify.prototype.constructor = Verify;
 
 Object.defineProperty(Verify.prototype,
   'v2', {
-  get: function() {
-    this._v2 = this._v2 || new V2(this);
-    return this._v2;
-  }
+    get: function() {
+      this._v2 = this._v2 || new V2(this);
+      return this._v2;
+    }
+});
+
+Object.defineProperty(Verify.prototype,
+  'forms', {
+    get: function() {
+      return this.v2.forms;
+    }
 });
 
 Object.defineProperty(Verify.prototype,
   'services', {
-  get: function() {
-    return this.v2.services;
-  }
+    get: function() {
+      return this.v2.services;
+    }
 });
 
 module.exports = Verify;

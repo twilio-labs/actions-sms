@@ -26,9 +26,6 @@ var MessagingConfigurationContext;
 /**
  * Initialize the MessagingConfigurationList
  *
- * PLEASE NOTE that this class contains beta products that are subject to change.
- * Use them with caution.
- *
  * @constructor Twilio.Verify.V2.ServiceContext.MessagingConfigurationList
  *
  * @param {Twilio.Verify.V2} version - Version of the resource
@@ -401,9 +398,6 @@ MessagingConfigurationList = function MessagingConfigurationList(version,
 /**
  * Initialize the MessagingConfigurationPage
  *
- * PLEASE NOTE that this class contains beta products that are subject to change.
- * Use them with caution.
- *
  * @constructor Twilio.Verify.V2.ServiceContext.MessagingConfigurationPage
  *
  * @param {V2} version - Version of the resource
@@ -471,9 +465,6 @@ MessagingConfigurationPage.prototype[util.inspect.custom] = function
 /**
  * Initialize the MessagingConfigurationContext
  *
- * PLEASE NOTE that this class contains beta products that are subject to change.
- * Use them with caution.
- *
  * @constructor Twilio.Verify.V2.ServiceContext.MessagingConfigurationInstance
  *
  * @property {string} accountSid - The SID of the Account that created the resource
@@ -516,17 +507,17 @@ MessagingConfigurationInstance = function
 
 Object.defineProperty(MessagingConfigurationInstance.prototype,
   '_proxy', {
-  get: function() {
-    if (!this._context) {
-      this._context = new MessagingConfigurationContext(
-        this._version,
-        this._solution.serviceSid,
-        this._solution.country
-      );
-    }
+    get: function() {
+      if (!this._context) {
+        this._context = new MessagingConfigurationContext(
+          this._version,
+          this._solution.serviceSid,
+          this._solution.country
+        );
+      }
 
-    return this._context;
-  }
+      return this._context;
+    }
 });
 
 /* jshint ignore:start */
@@ -610,9 +601,6 @@ MessagingConfigurationInstance.prototype[util.inspect.custom] = function
 /* jshint ignore:start */
 /**
  * Initialize the MessagingConfigurationContext
- *
- * PLEASE NOTE that this class contains beta products that are subject to change.
- * Use them with caution.
  *
  * @constructor Twilio.Verify.V2.ServiceContext.MessagingConfigurationContext
  *

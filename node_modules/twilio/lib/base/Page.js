@@ -156,7 +156,10 @@ Page.prototype.processResponse = function(response) {
     throw new RestException(response);
   }
 
-  return JSON.parse(response.body);
+  if (typeof response.body === 'string') {
+    return JSON.parse(response.body);
+  }
+  return response.body;
 };
 
 /**

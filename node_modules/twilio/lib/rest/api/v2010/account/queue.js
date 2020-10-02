@@ -455,20 +455,20 @@ QueuePage.prototype[util.inspect.custom] = function inspect(depth, options) {
  *
  * @constructor Twilio.Api.V2010.AccountContext.QueueInstance
  *
+ * @property {Date} dateUpdated -
+ *          The RFC 2822 date and time in GMT that this resource was last updated
+ * @property {number} currentSize - The number of calls currently in the queue.
+ * @property {string} friendlyName -
+ *          A string that you assigned to describe this resource
+ * @property {string} uri -
+ *          The URI of this resource, relative to `https://api.twilio.com`
  * @property {string} accountSid -
  *          The SID of the Account that created this resource
  * @property {number} averageWaitTime - Average wait time of members in the queue
- * @property {number} currentSize - The number of calls currently in the queue.
+ * @property {string} sid - The unique string that identifies this resource
  * @property {Date} dateCreated -
  *          The RFC 2822 date and time in GMT that this resource was created
- * @property {Date} dateUpdated -
- *          The RFC 2822 date and time in GMT that this resource was last updated
- * @property {string} friendlyName -
- *          A string that you assigned to describe this resource
  * @property {number} maxSize - The max number of calls allowed in the queue
- * @property {string} sid - The unique string that identifies this resource
- * @property {string} uri -
- *          The URI of this resource, relative to `https://api.twilio.com`
  *
  * @param {V2010} version - Version of the resource
  * @param {QueuePayload} payload - The instance payload
@@ -480,15 +480,15 @@ QueueInstance = function QueueInstance(version, payload, accountSid, sid) {
   this._version = version;
 
   // Marshaled Properties
+  this.dateUpdated = deserialize.rfc2822DateTime(payload.date_updated); // jshint ignore:line
+  this.currentSize = deserialize.integer(payload.current_size); // jshint ignore:line
+  this.friendlyName = payload.friendly_name; // jshint ignore:line
+  this.uri = payload.uri; // jshint ignore:line
   this.accountSid = payload.account_sid; // jshint ignore:line
   this.averageWaitTime = deserialize.integer(payload.average_wait_time); // jshint ignore:line
-  this.currentSize = deserialize.integer(payload.current_size); // jshint ignore:line
-  this.dateCreated = deserialize.rfc2822DateTime(payload.date_created); // jshint ignore:line
-  this.dateUpdated = deserialize.rfc2822DateTime(payload.date_updated); // jshint ignore:line
-  this.friendlyName = payload.friendly_name; // jshint ignore:line
-  this.maxSize = deserialize.integer(payload.max_size); // jshint ignore:line
   this.sid = payload.sid; // jshint ignore:line
-  this.uri = payload.uri; // jshint ignore:line
+  this.dateCreated = deserialize.rfc2822DateTime(payload.date_created); // jshint ignore:line
+  this.maxSize = deserialize.integer(payload.max_size); // jshint ignore:line
 
   // Context
   this._context = undefined;
@@ -497,13 +497,13 @@ QueueInstance = function QueueInstance(version, payload, accountSid, sid) {
 
 Object.defineProperty(QueueInstance.prototype,
   '_proxy', {
-  get: function() {
-    if (!this._context) {
-      this._context = new QueueContext(this._version, this._solution.accountSid, this._solution.sid);
-    }
+    get: function() {
+      if (!this._context) {
+        this._context = new QueueContext(this._version, this._solution.accountSid, this._solution.sid);
+      }
 
-    return this._context;
-  }
+      return this._context;
+    }
 });
 
 /* jshint ignore:start */
@@ -742,12 +742,12 @@ QueueContext.prototype.remove = function remove(callback) {
 
 Object.defineProperty(QueueContext.prototype,
   'members', {
-  get: function() {
-    if (!this._members) {
-      this._members = new MemberList(this._version, this._solution.accountSid, this._solution.sid);
+    get: function() {
+      if (!this._members) {
+        this._members = new MemberList(this._version, this._solution.accountSid, this._solution.sid);
+      }
+      return this._members;
     }
-    return this._members;
-  }
 });
 
 /* jshint ignore:start */

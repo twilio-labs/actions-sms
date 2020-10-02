@@ -68,6 +68,8 @@ UserList = function UserList(version, serviceSid) {
    * @param {string} [opts.attributes] -
    *          A valid JSON string that contains application-specific data
    * @param {string} [opts.friendlyName] - A string to describe the new resource
+   * @param {user.webhook_enabled_type} [opts.xTwilioWebhookEnabled] -
+   *          The X-Twilio-Webhook-Enabled HTTP request header
    * @param {function} [callback] - Callback to handle processed record
    *
    * @returns {Promise} Resolves to processed UserInstance
@@ -88,8 +90,9 @@ UserList = function UserList(version, serviceSid) {
       'Attributes': _.get(opts, 'attributes'),
       'FriendlyName': _.get(opts, 'friendlyName')
     });
+    var headers = values.of({'X-Twilio-Webhook-Enabled': _.get(opts, 'xTwilioWebhookEnabled')});
 
-    var promise = this._version.create({uri: this._uri, method: 'POST', data: data});
+    var promise = this._version.create({uri: this._uri, method: 'POST', data: data, headers: headers});
 
     promise = promise.then(function(payload) {
       deferred.resolve(new UserInstance(
@@ -471,7 +474,7 @@ UserPage.prototype[util.inspect.custom] = function inspect(depth, options) {
  *          The JSON string that stores application-specific data
  * @property {string} friendlyName -
  *          The string that you assigned to describe the resource
- * @property {string} roleSid - The SID of the assigned to the user
+ * @property {string} roleSid - The SID of the Role assigned to the user
  * @property {string} identity - The string that identifies the resource's User
  * @property {boolean} isOnline -
  *          Whether the User is actively connected to the Service instance and online
@@ -520,13 +523,13 @@ UserInstance = function UserInstance(version, payload, serviceSid, sid) {
 
 Object.defineProperty(UserInstance.prototype,
   '_proxy', {
-  get: function() {
-    if (!this._context) {
-      this._context = new UserContext(this._version, this._solution.serviceSid, this._solution.sid);
-    }
+    get: function() {
+      if (!this._context) {
+        this._context = new UserContext(this._version, this._solution.serviceSid, this._solution.sid);
+      }
 
-    return this._context;
-  }
+      return this._context;
+    }
 });
 
 /* jshint ignore:start */
@@ -573,6 +576,8 @@ UserInstance.prototype.remove = function remove(callback) {
  * @param {string} [opts.attributes] -
  *          A valid JSON string that contains application-specific data
  * @param {string} [opts.friendlyName] - A string to describe the resource
+ * @param {user.webhook_enabled_type} [opts.xTwilioWebhookEnabled] -
+ *          The X-Twilio-Webhook-Enabled HTTP request header
  * @param {function} [callback] - Callback to handle processed record
  *
  * @returns {Promise} Resolves to processed UserInstance
@@ -742,6 +747,8 @@ UserContext.prototype.remove = function remove(callback) {
  * @param {string} [opts.attributes] -
  *          A valid JSON string that contains application-specific data
  * @param {string} [opts.friendlyName] - A string to describe the resource
+ * @param {user.webhook_enabled_type} [opts.xTwilioWebhookEnabled] -
+ *          The X-Twilio-Webhook-Enabled HTTP request header
  * @param {function} [callback] - Callback to handle processed record
  *
  * @returns {Promise} Resolves to processed UserInstance
@@ -760,8 +767,9 @@ UserContext.prototype.update = function update(opts, callback) {
     'Attributes': _.get(opts, 'attributes'),
     'FriendlyName': _.get(opts, 'friendlyName')
   });
+  var headers = values.of({'X-Twilio-Webhook-Enabled': _.get(opts, 'xTwilioWebhookEnabled')});
 
-  var promise = this._version.update({uri: this._uri, method: 'POST', data: data});
+  var promise = this._version.update({uri: this._uri, method: 'POST', data: data, headers: headers});
 
   promise = promise.then(function(payload) {
     deferred.resolve(new UserInstance(
@@ -785,30 +793,30 @@ UserContext.prototype.update = function update(opts, callback) {
 
 Object.defineProperty(UserContext.prototype,
   'userChannels', {
-  get: function() {
-    if (!this._userChannels) {
-      this._userChannels = new UserChannelList(
-        this._version,
-        this._solution.serviceSid,
-        this._solution.sid
-      );
+    get: function() {
+      if (!this._userChannels) {
+        this._userChannels = new UserChannelList(
+          this._version,
+          this._solution.serviceSid,
+          this._solution.sid
+        );
+      }
+      return this._userChannels;
     }
-    return this._userChannels;
-  }
 });
 
 Object.defineProperty(UserContext.prototype,
   'userBindings', {
-  get: function() {
-    if (!this._userBindings) {
-      this._userBindings = new UserBindingList(
-        this._version,
-        this._solution.serviceSid,
-        this._solution.sid
-      );
+    get: function() {
+      if (!this._userBindings) {
+        this._userBindings = new UserBindingList(
+          this._version,
+          this._solution.serviceSid,
+          this._solution.sid
+        );
+      }
+      return this._userBindings;
     }
-    return this._userBindings;
-  }
 });
 
 /* jshint ignore:start */

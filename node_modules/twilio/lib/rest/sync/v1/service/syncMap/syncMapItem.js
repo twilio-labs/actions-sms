@@ -558,18 +558,18 @@ SyncMapItemInstance = function SyncMapItemInstance(version, payload, serviceSid,
 
 Object.defineProperty(SyncMapItemInstance.prototype,
   '_proxy', {
-  get: function() {
-    if (!this._context) {
-      this._context = new SyncMapItemContext(
-        this._version,
-        this._solution.serviceSid,
-        this._solution.mapSid,
-        this._solution.key
-      );
-    }
+    get: function() {
+      if (!this._context) {
+        this._context = new SyncMapItemContext(
+          this._version,
+          this._solution.serviceSid,
+          this._solution.mapSid,
+          this._solution.key
+        );
+      }
 
-    return this._context;
-  }
+      return this._context;
+    }
 });
 
 /* jshint ignore:start */
@@ -595,13 +595,15 @@ SyncMapItemInstance.prototype.fetch = function fetch(callback) {
  * @function remove
  * @memberof Twilio.Sync.V1.ServiceContext.SyncMapContext.SyncMapItemInstance#
  *
+ * @param {object} [opts] - Options for request
+ * @param {string} [opts.ifMatch] - The If-Match HTTP request header
  * @param {function} [callback] - Callback to handle processed record
  *
  * @returns {Promise} Resolves to processed SyncMapItemInstance
  */
 /* jshint ignore:end */
-SyncMapItemInstance.prototype.remove = function remove(callback) {
-  return this._proxy.remove(callback);
+SyncMapItemInstance.prototype.remove = function remove(opts, callback) {
+  return this._proxy.remove(opts, callback);
 };
 
 /* jshint ignore:start */
@@ -619,6 +621,7 @@ SyncMapItemInstance.prototype.remove = function remove(callback) {
  *          How long, in seconds, before the Map Item expires
  * @param {number} [opts.collectionTtl] -
  *          How long, in seconds, before the Map Item's parent Sync Map expires and is deleted
+ * @param {string} [opts.ifMatch] - The If-Match HTTP request header
  * @param {function} [callback] - Callback to handle processed record
  *
  * @returns {Promise} Resolves to processed SyncMapItemInstance
@@ -724,14 +727,24 @@ SyncMapItemContext.prototype.fetch = function fetch(callback) {
  * @function remove
  * @memberof Twilio.Sync.V1.ServiceContext.SyncMapContext.SyncMapItemContext#
  *
+ * @param {object} [opts] - Options for request
+ * @param {string} [opts.ifMatch] - The If-Match HTTP request header
  * @param {function} [callback] - Callback to handle processed record
  *
  * @returns {Promise} Resolves to processed SyncMapItemInstance
  */
 /* jshint ignore:end */
-SyncMapItemContext.prototype.remove = function remove(callback) {
+SyncMapItemContext.prototype.remove = function remove(opts, callback) {
+  if (_.isFunction(opts)) {
+    callback = opts;
+    opts = {};
+  }
+  opts = opts || {};
+
   var deferred = Q.defer();
-  var promise = this._version.remove({uri: this._uri, method: 'DELETE'});
+  var headers = values.of({'If-Match': _.get(opts, 'ifMatch')});
+
+  var promise = this._version.remove({uri: this._uri, method: 'DELETE', headers: headers});
 
   promise = promise.then(function(payload) {
     deferred.resolve(payload);
@@ -763,6 +776,7 @@ SyncMapItemContext.prototype.remove = function remove(callback) {
  *          How long, in seconds, before the Map Item expires
  * @param {number} [opts.collectionTtl] -
  *          How long, in seconds, before the Map Item's parent Sync Map expires and is deleted
+ * @param {string} [opts.ifMatch] - The If-Match HTTP request header
  * @param {function} [callback] - Callback to handle processed record
  *
  * @returns {Promise} Resolves to processed SyncMapItemInstance
@@ -782,8 +796,9 @@ SyncMapItemContext.prototype.update = function update(opts, callback) {
     'ItemTtl': _.get(opts, 'itemTtl'),
     'CollectionTtl': _.get(opts, 'collectionTtl')
   });
+  var headers = values.of({'If-Match': _.get(opts, 'ifMatch')});
 
-  var promise = this._version.update({uri: this._uri, method: 'POST', data: data});
+  var promise = this._version.update({uri: this._uri, method: 'POST', data: data, headers: headers});
 
   promise = promise.then(function(payload) {
     deferred.resolve(new SyncMapItemInstance(

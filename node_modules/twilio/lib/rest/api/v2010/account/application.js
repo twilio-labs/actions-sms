@@ -575,17 +575,17 @@ ApplicationInstance = function ApplicationInstance(version, payload, accountSid,
 
 Object.defineProperty(ApplicationInstance.prototype,
   '_proxy', {
-  get: function() {
-    if (!this._context) {
-      this._context = new ApplicationContext(
-        this._version,
-        this._solution.accountSid,
-        this._solution.sid
-      );
-    }
+    get: function() {
+      if (!this._context) {
+        this._context = new ApplicationContext(
+          this._version,
+          this._solution.accountSid,
+          this._solution.sid
+        );
+      }
 
-    return this._context;
-  }
+      return this._context;
+    }
 });
 
 /* jshint ignore:start */
@@ -652,7 +652,7 @@ ApplicationInstance.prototype.fetch = function fetch(callback) {
  * @param {string} [opts.smsFallbackMethod] -
  *          The HTTP method to use with sms_fallback_url
  * @param {string} [opts.smsStatusCallback] -
- *          The URL to send status information to your application
+ *          Same as message_status_callback. Deprecated, included for backwards compatibility.
  * @param {string} [opts.messageStatusCallback] -
  *          The URL to send message status information to your application
  * @param {function} [callback] - Callback to handle processed record
@@ -809,7 +809,7 @@ ApplicationContext.prototype.fetch = function fetch(callback) {
  * @param {string} [opts.smsFallbackMethod] -
  *          The HTTP method to use with sms_fallback_url
  * @param {string} [opts.smsStatusCallback] -
- *          The URL to send status information to your application
+ *          Same as message_status_callback. Deprecated, included for backwards compatibility.
  * @param {string} [opts.messageStatusCallback] -
  *          The URL to send message status information to your application
  * @param {function} [callback] - Callback to handle processed record

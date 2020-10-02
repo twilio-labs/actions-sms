@@ -525,13 +525,13 @@ ExecutionInstance = function ExecutionInstance(version, payload, flowSid, sid) {
 
 Object.defineProperty(ExecutionInstance.prototype,
   '_proxy', {
-  get: function() {
-    if (!this._context) {
-      this._context = new ExecutionContext(this._version, this._solution.flowSid, this._solution.sid);
-    }
+    get: function() {
+      if (!this._context) {
+        this._context = new ExecutionContext(this._version, this._solution.flowSid, this._solution.sid);
+      }
 
-    return this._context;
-  }
+      return this._context;
+    }
 });
 
 /* jshint ignore:start */
@@ -564,6 +564,24 @@ ExecutionInstance.prototype.fetch = function fetch(callback) {
 /* jshint ignore:end */
 ExecutionInstance.prototype.remove = function remove(callback) {
   return this._proxy.remove(callback);
+};
+
+/* jshint ignore:start */
+/**
+ * update a ExecutionInstance
+ *
+ * @function update
+ * @memberof Twilio.Studio.V1.FlowContext.ExecutionInstance#
+ *
+ * @param {object} opts - Options for request
+ * @param {execution.status} opts.status - The status of the Execution
+ * @param {function} [callback] - Callback to handle processed record
+ *
+ * @returns {Promise} Resolves to processed ExecutionInstance
+ */
+/* jshint ignore:end */
+ExecutionInstance.prototype.update = function update(opts, callback) {
+  return this._proxy.update(opts, callback);
 };
 
 /* jshint ignore:start */
@@ -715,28 +733,75 @@ ExecutionContext.prototype.remove = function remove(callback) {
   return deferred.promise;
 };
 
+/* jshint ignore:start */
+/**
+ * update a ExecutionInstance
+ *
+ * @function update
+ * @memberof Twilio.Studio.V1.FlowContext.ExecutionContext#
+ *
+ * @param {object} opts - Options for request
+ * @param {execution.status} opts.status - The status of the Execution
+ * @param {function} [callback] - Callback to handle processed record
+ *
+ * @returns {Promise} Resolves to processed ExecutionInstance
+ */
+/* jshint ignore:end */
+ExecutionContext.prototype.update = function update(opts, callback) {
+  if (_.isUndefined(opts)) {
+    throw new Error('Required parameter "opts" missing.');
+  }
+  if (_.isUndefined(opts.status)) {
+    throw new Error('Required parameter "opts.status" missing.');
+  }
+
+  var deferred = Q.defer();
+  var data = values.of({'Status': _.get(opts, 'status')});
+
+  var promise = this._version.update({uri: this._uri, method: 'POST', data: data});
+
+  promise = promise.then(function(payload) {
+    deferred.resolve(new ExecutionInstance(
+      this._version,
+      payload,
+      this._solution.flowSid,
+      this._solution.sid
+    ));
+  }.bind(this));
+
+  promise.catch(function(error) {
+    deferred.reject(error);
+  });
+
+  if (_.isFunction(callback)) {
+    deferred.promise.nodeify(callback);
+  }
+
+  return deferred.promise;
+};
+
 Object.defineProperty(ExecutionContext.prototype,
   'steps', {
-  get: function() {
-    if (!this._steps) {
-      this._steps = new ExecutionStepList(this._version, this._solution.flowSid, this._solution.sid);
+    get: function() {
+      if (!this._steps) {
+        this._steps = new ExecutionStepList(this._version, this._solution.flowSid, this._solution.sid);
+      }
+      return this._steps;
     }
-    return this._steps;
-  }
 });
 
 Object.defineProperty(ExecutionContext.prototype,
   'executionContext', {
-  get: function() {
-    if (!this._executionContext) {
-      this._executionContext = new ExecutionContextList(
-        this._version,
-        this._solution.flowSid,
-        this._solution.sid
-      );
+    get: function() {
+      if (!this._executionContext) {
+        this._executionContext = new ExecutionContextList(
+          this._version,
+          this._solution.flowSid,
+          this._solution.sid
+        );
+      }
+      return this._executionContext;
     }
-    return this._executionContext;
-  }
 });
 
 /* jshint ignore:start */

@@ -83,6 +83,8 @@ ServiceList = function ServiceList(version) {
    * @param {boolean} [opts.logEnabled] - Whether to log notifications
    * @param {string} [opts.alexaSkillId] - Deprecated
    * @param {string} [opts.defaultAlexaNotificationProtocolVersion] - Deprecated
+   * @param {string} [opts.deliveryCallbackUrl] - Webhook URL
+   * @param {boolean} [opts.deliveryCallbackEnabled] - Enable delivery callbacks
    * @param {function} [callback] - Callback to handle processed record
    *
    * @returns {Promise} Resolves to processed ServiceInstance
@@ -108,7 +110,9 @@ ServiceList = function ServiceList(version) {
       'DefaultFcmNotificationProtocolVersion': _.get(opts, 'defaultFcmNotificationProtocolVersion'),
       'LogEnabled': serialize.bool(_.get(opts, 'logEnabled')),
       'AlexaSkillId': _.get(opts, 'alexaSkillId'),
-      'DefaultAlexaNotificationProtocolVersion': _.get(opts, 'defaultAlexaNotificationProtocolVersion')
+      'DefaultAlexaNotificationProtocolVersion': _.get(opts, 'defaultAlexaNotificationProtocolVersion'),
+      'DeliveryCallbackUrl': _.get(opts, 'deliveryCallbackUrl'),
+      'DeliveryCallbackEnabled': serialize.bool(_.get(opts, 'deliveryCallbackEnabled'))
     });
 
     var promise = this._version.create({uri: this._uri, method: 'POST', data: data});
@@ -521,6 +525,8 @@ ServicePage.prototype[util.inspect.custom] = function inspect(depth, options) {
  * @property {string} links - The URLs of the resources related to the service
  * @property {string} alexaSkillId - Deprecated
  * @property {string} defaultAlexaNotificationProtocolVersion - Deprecated
+ * @property {string} deliveryCallbackUrl - Webhook URL
+ * @property {boolean} deliveryCallbackEnabled - Enable delivery callbacks
  *
  * @param {V1} version - Version of the resource
  * @param {ServicePayload} payload - The instance payload
@@ -549,6 +555,8 @@ ServiceInstance = function ServiceInstance(version, payload, sid) {
   this.links = payload.links; // jshint ignore:line
   this.alexaSkillId = payload.alexa_skill_id; // jshint ignore:line
   this.defaultAlexaNotificationProtocolVersion = payload.default_alexa_notification_protocol_version; // jshint ignore:line
+  this.deliveryCallbackUrl = payload.delivery_callback_url; // jshint ignore:line
+  this.deliveryCallbackEnabled = payload.delivery_callback_enabled; // jshint ignore:line
 
   // Context
   this._context = undefined;
@@ -557,13 +565,13 @@ ServiceInstance = function ServiceInstance(version, payload, sid) {
 
 Object.defineProperty(ServiceInstance.prototype,
   '_proxy', {
-  get: function() {
-    if (!this._context) {
-      this._context = new ServiceContext(this._version, this._solution.sid);
-    }
+    get: function() {
+      if (!this._context) {
+        this._context = new ServiceContext(this._version, this._solution.sid);
+      }
 
-    return this._context;
-  }
+      return this._context;
+    }
 });
 
 /* jshint ignore:start */
@@ -625,6 +633,8 @@ ServiceInstance.prototype.fetch = function fetch(callback) {
  * @param {boolean} [opts.logEnabled] - Whether to log notifications
  * @param {string} [opts.alexaSkillId] - Deprecated
  * @param {string} [opts.defaultAlexaNotificationProtocolVersion] - Deprecated
+ * @param {string} [opts.deliveryCallbackUrl] - Webhook URL
+ * @param {boolean} [opts.deliveryCallbackEnabled] - Enable delivery callbacks
  * @param {function} [callback] - Callback to handle processed record
  *
  * @returns {Promise} Resolves to processed ServiceInstance
@@ -807,6 +817,8 @@ ServiceContext.prototype.fetch = function fetch(callback) {
  * @param {boolean} [opts.logEnabled] - Whether to log notifications
  * @param {string} [opts.alexaSkillId] - Deprecated
  * @param {string} [opts.defaultAlexaNotificationProtocolVersion] - Deprecated
+ * @param {string} [opts.deliveryCallbackUrl] - Webhook URL
+ * @param {boolean} [opts.deliveryCallbackEnabled] - Enable delivery callbacks
  * @param {function} [callback] - Callback to handle processed record
  *
  * @returns {Promise} Resolves to processed ServiceInstance
@@ -832,7 +844,9 @@ ServiceContext.prototype.update = function update(opts, callback) {
     'DefaultFcmNotificationProtocolVersion': _.get(opts, 'defaultFcmNotificationProtocolVersion'),
     'LogEnabled': serialize.bool(_.get(opts, 'logEnabled')),
     'AlexaSkillId': _.get(opts, 'alexaSkillId'),
-    'DefaultAlexaNotificationProtocolVersion': _.get(opts, 'defaultAlexaNotificationProtocolVersion')
+    'DefaultAlexaNotificationProtocolVersion': _.get(opts, 'defaultAlexaNotificationProtocolVersion'),
+    'DeliveryCallbackUrl': _.get(opts, 'deliveryCallbackUrl'),
+    'DeliveryCallbackEnabled': serialize.bool(_.get(opts, 'deliveryCallbackEnabled'))
   });
 
   var promise = this._version.update({uri: this._uri, method: 'POST', data: data});
@@ -854,22 +868,22 @@ ServiceContext.prototype.update = function update(opts, callback) {
 
 Object.defineProperty(ServiceContext.prototype,
   'bindings', {
-  get: function() {
-    if (!this._bindings) {
-      this._bindings = new BindingList(this._version, this._solution.sid);
+    get: function() {
+      if (!this._bindings) {
+        this._bindings = new BindingList(this._version, this._solution.sid);
+      }
+      return this._bindings;
     }
-    return this._bindings;
-  }
 });
 
 Object.defineProperty(ServiceContext.prototype,
   'notifications', {
-  get: function() {
-    if (!this._notifications) {
-      this._notifications = new NotificationList(this._version, this._solution.sid);
+    get: function() {
+      if (!this._notifications) {
+        this._notifications = new NotificationList(this._version, this._solution.sid);
+      }
+      return this._notifications;
     }
-    return this._notifications;
-  }
 });
 
 /* jshint ignore:start */

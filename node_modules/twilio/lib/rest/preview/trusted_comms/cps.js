@@ -165,8 +165,8 @@ CpsPage.prototype[util.inspect.custom] = function inspect(depth, options) {
  *
  * @constructor Twilio.Preview.TrustedComms.CpsInstance
  *
- * @property {string} phoneNumber - Phone number passed.
  * @property {string} cpsUrl - CPS URL of the phone number.
+ * @property {string} phoneNumber - Phone number passed.
  * @property {string} url - The URL of this resource.
  *
  * @param {TrustedComms} version - Version of the resource
@@ -177,8 +177,8 @@ CpsInstance = function CpsInstance(version, payload) {
   this._version = version;
 
   // Marshaled Properties
-  this.phoneNumber = payload.phone_number; // jshint ignore:line
   this.cpsUrl = payload.cps_url; // jshint ignore:line
+  this.phoneNumber = payload.phone_number; // jshint ignore:line
   this.url = payload.url; // jshint ignore:line
 
   // Context
@@ -188,13 +188,13 @@ CpsInstance = function CpsInstance(version, payload) {
 
 Object.defineProperty(CpsInstance.prototype,
   '_proxy', {
-  get: function() {
-    if (!this._context) {
-      this._context = new CpsContext(this._version);
-    }
+    get: function() {
+      if (!this._context) {
+        this._context = new CpsContext(this._version);
+      }
 
-    return this._context;
-  }
+      return this._context;
+    }
 });
 
 /* jshint ignore:start */
@@ -204,13 +204,16 @@ Object.defineProperty(CpsInstance.prototype,
  * @function fetch
  * @memberof Twilio.Preview.TrustedComms.CpsInstance#
  *
+ * @param {object} [opts] - Options for request
+ * @param {string} [opts.xXcnamSensitivePhoneNumber] -
+ *          Phone number to retrieve CPS.
  * @param {function} [callback] - Callback to handle processed record
  *
  * @returns {Promise} Resolves to processed CpsInstance
  */
 /* jshint ignore:end */
-CpsInstance.prototype.fetch = function fetch(callback) {
-  return this._proxy.fetch(callback);
+CpsInstance.prototype.fetch = function fetch(opts, callback) {
+  return this._proxy.fetch(opts, callback);
 };
 
 /* jshint ignore:start */
@@ -266,14 +269,27 @@ CpsContext = function CpsContext(version) {
  * @function fetch
  * @memberof Twilio.Preview.TrustedComms.CpsContext#
  *
+ * @param {object} [opts] - Options for request
+ * @param {string} [opts.xXcnamSensitivePhoneNumber] -
+ *          Phone number to retrieve CPS.
  * @param {function} [callback] - Callback to handle processed record
  *
  * @returns {Promise} Resolves to processed CpsInstance
  */
 /* jshint ignore:end */
-CpsContext.prototype.fetch = function fetch(callback) {
+CpsContext.prototype.fetch = function fetch(opts, callback) {
+  if (_.isFunction(opts)) {
+    callback = opts;
+    opts = {};
+  }
+  opts = opts || {};
+
   var deferred = Q.defer();
-  var promise = this._version.fetch({uri: this._uri, method: 'GET'});
+  var headers = values.of({
+    'X-Xcnam-Sensitive-Phone-Number': _.get(opts, 'xXcnamSensitivePhoneNumber')
+  });
+
+  var promise = this._version.fetch({uri: this._uri, method: 'GET', headers: headers});
 
   promise = promise.then(function(payload) {
     deferred.resolve(new CpsInstance(this._version, payload));

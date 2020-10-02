@@ -15,6 +15,8 @@ var util = require('util');  /* jshint ignore:line */
 var Page = require('../../../../../base/Page');  /* jshint ignore:line */
 var deserialize = require(
     '../../../../../base/deserialize');  /* jshint ignore:line */
+var serialize = require(
+    '../../../../../base/serialize');  /* jshint ignore:line */
 var values = require('../../../../../base/values');  /* jshint ignore:line */
 
 var UserChannelList;
@@ -473,18 +475,18 @@ UserChannelInstance = function UserChannelInstance(version, payload, serviceSid,
 
 Object.defineProperty(UserChannelInstance.prototype,
   '_proxy', {
-  get: function() {
-    if (!this._context) {
-      this._context = new UserChannelContext(
-        this._version,
-        this._solution.serviceSid,
-        this._solution.userSid,
-        this._solution.channelSid
-      );
-    }
+    get: function() {
+      if (!this._context) {
+        this._context = new UserChannelContext(
+          this._version,
+          this._solution.serviceSid,
+          this._solution.userSid,
+          this._solution.channelSid
+        );
+      }
 
-    return this._context;
-  }
+      return this._context;
+    }
 });
 
 /* jshint ignore:start */
@@ -505,14 +507,34 @@ UserChannelInstance.prototype.fetch = function fetch(callback) {
 
 /* jshint ignore:start */
 /**
+ * remove a UserChannelInstance
+ *
+ * @function remove
+ * @memberof Twilio.Chat.V2.ServiceContext.UserContext.UserChannelInstance#
+ *
+ * @param {function} [callback] - Callback to handle processed record
+ *
+ * @returns {Promise} Resolves to processed UserChannelInstance
+ */
+/* jshint ignore:end */
+UserChannelInstance.prototype.remove = function remove(callback) {
+  return this._proxy.remove(callback);
+};
+
+/* jshint ignore:start */
+/**
  * update a UserChannelInstance
  *
  * @function update
  * @memberof Twilio.Chat.V2.ServiceContext.UserContext.UserChannelInstance#
  *
- * @param {object} opts - Options for request
- * @param {user_channel.notification_level} opts.notificationLevel -
+ * @param {object} [opts] - Options for request
+ * @param {user_channel.notification_level} [opts.notificationLevel] -
  *          The push notification level to assign to the User Channel
+ * @param {number} [opts.lastConsumedMessageIndex] -
+ *          The index of the last Message that the Member has read within the Channel
+ * @param {Date} [opts.lastConsumptionTimestamp] -
+ *          The ISO 8601 based timestamp string that represents the datetime of the last Message read event for the Member within the Channel
  * @param {function} [callback] - Callback to handle processed record
  *
  * @returns {Promise} Resolves to processed UserChannelInstance
@@ -611,29 +633,67 @@ UserChannelContext.prototype.fetch = function fetch(callback) {
 
 /* jshint ignore:start */
 /**
+ * remove a UserChannelInstance
+ *
+ * @function remove
+ * @memberof Twilio.Chat.V2.ServiceContext.UserContext.UserChannelContext#
+ *
+ * @param {function} [callback] - Callback to handle processed record
+ *
+ * @returns {Promise} Resolves to processed UserChannelInstance
+ */
+/* jshint ignore:end */
+UserChannelContext.prototype.remove = function remove(callback) {
+  var deferred = Q.defer();
+  var promise = this._version.remove({uri: this._uri, method: 'DELETE'});
+
+  promise = promise.then(function(payload) {
+    deferred.resolve(payload);
+  }.bind(this));
+
+  promise.catch(function(error) {
+    deferred.reject(error);
+  });
+
+  if (_.isFunction(callback)) {
+    deferred.promise.nodeify(callback);
+  }
+
+  return deferred.promise;
+};
+
+/* jshint ignore:start */
+/**
  * update a UserChannelInstance
  *
  * @function update
  * @memberof Twilio.Chat.V2.ServiceContext.UserContext.UserChannelContext#
  *
- * @param {object} opts - Options for request
- * @param {user_channel.notification_level} opts.notificationLevel -
+ * @param {object} [opts] - Options for request
+ * @param {user_channel.notification_level} [opts.notificationLevel] -
  *          The push notification level to assign to the User Channel
+ * @param {number} [opts.lastConsumedMessageIndex] -
+ *          The index of the last Message that the Member has read within the Channel
+ * @param {Date} [opts.lastConsumptionTimestamp] -
+ *          The ISO 8601 based timestamp string that represents the datetime of the last Message read event for the Member within the Channel
  * @param {function} [callback] - Callback to handle processed record
  *
  * @returns {Promise} Resolves to processed UserChannelInstance
  */
 /* jshint ignore:end */
 UserChannelContext.prototype.update = function update(opts, callback) {
-  if (_.isUndefined(opts)) {
-    throw new Error('Required parameter "opts" missing.');
+  if (_.isFunction(opts)) {
+    callback = opts;
+    opts = {};
   }
-  if (_.isUndefined(opts.notificationLevel)) {
-    throw new Error('Required parameter "opts.notificationLevel" missing.');
-  }
+  opts = opts || {};
 
   var deferred = Q.defer();
-  var data = values.of({'NotificationLevel': _.get(opts, 'notificationLevel')});
+  var data = values.of({
+    'NotificationLevel': _.get(opts, 'notificationLevel'),
+    'LastConsumedMessageIndex': _.get(opts, 'lastConsumedMessageIndex'),
+    'LastConsumptionTimestamp': serialize.iso8601DateTime(_.get(opts, 'lastConsumptionTimestamp'))
+  });
 
   var promise = this._version.update({uri: this._uri, method: 'POST', data: data});
 

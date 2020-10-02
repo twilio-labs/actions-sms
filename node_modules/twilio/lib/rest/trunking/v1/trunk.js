@@ -18,8 +18,7 @@ var IpAccessControlListList = require(
 var OriginationUrlList = require('./trunk/originationUrl').OriginationUrlList;
 var Page = require('../../../base/Page');  /* jshint ignore:line */
 var PhoneNumberList = require('./trunk/phoneNumber').PhoneNumberList;
-var TerminatingSipDomainList = require(
-    './trunk/terminatingSipDomain').TerminatingSipDomainList;
+var RecordingList = require('./trunk/recording').RecordingList;
 var deserialize = require(
     '../../../base/deserialize');  /* jshint ignore:line */
 var serialize = require('../../../base/serialize');  /* jshint ignore:line */
@@ -73,8 +72,8 @@ TrunkList = function TrunkList(version) {
    *          The HTTP URL that we should call if an error occurs while sending SIP traffic towards your configured Origination URL
    * @param {string} [opts.disasterRecoveryMethod] -
    *          The HTTP method we should use to call the disaster_recovery_url
-   * @param {trunk.recording_setting} [opts.recording] -
-   *          The recording settings for the trunk
+   * @param {trunk.transfer_setting} [opts.transferMode] -
+   *          The call transfer settings for the trunk
    * @param {boolean} [opts.secure] -
    *          Whether Secure Trunking is enabled for the trunk
    * @param {boolean} [opts.cnamLookupEnabled] -
@@ -97,7 +96,7 @@ TrunkList = function TrunkList(version) {
       'DomainName': _.get(opts, 'domainName'),
       'DisasterRecoveryUrl': _.get(opts, 'disasterRecoveryUrl'),
       'DisasterRecoveryMethod': _.get(opts, 'disasterRecoveryMethod'),
-      'Recording': _.get(opts, 'recording'),
+      'TransferMode': _.get(opts, 'transferMode'),
       'Secure': serialize.bool(_.get(opts, 'secure')),
       'CnamLookupEnabled': serialize.bool(_.get(opts, 'cnamLookupEnabled'))
     });
@@ -482,6 +481,8 @@ TrunkPage.prototype[util.inspect.custom] = function inspect(depth, options) {
  *          The string that you assigned to describe the resource
  * @property {boolean} secure - Whether Secure Trunking is enabled for the trunk
  * @property {object} recording - The recording settings for the trunk
+ * @property {trunk.transfer_setting} transferMode -
+ *          The call transfer settings for the trunk
  * @property {boolean} cnamLookupEnabled -
  *          Whether Caller ID Name (CNAM) lookup is enabled for the trunk
  * @property {string} authType - The types of authentication mapped to the domain
@@ -510,6 +511,7 @@ TrunkInstance = function TrunkInstance(version, payload, sid) {
   this.friendlyName = payload.friendly_name; // jshint ignore:line
   this.secure = payload.secure; // jshint ignore:line
   this.recording = payload.recording; // jshint ignore:line
+  this.transferMode = payload.transfer_mode; // jshint ignore:line
   this.cnamLookupEnabled = payload.cnam_lookup_enabled; // jshint ignore:line
   this.authType = payload.auth_type; // jshint ignore:line
   this.authTypeSet = payload.auth_type_set; // jshint ignore:line
@@ -526,13 +528,13 @@ TrunkInstance = function TrunkInstance(version, payload, sid) {
 
 Object.defineProperty(TrunkInstance.prototype,
   '_proxy', {
-  get: function() {
-    if (!this._context) {
-      this._context = new TrunkContext(this._version, this._solution.sid);
-    }
+    get: function() {
+      if (!this._context) {
+        this._context = new TrunkContext(this._version, this._solution.sid);
+      }
 
-    return this._context;
-  }
+      return this._context;
+    }
 });
 
 /* jshint ignore:start */
@@ -582,8 +584,8 @@ TrunkInstance.prototype.remove = function remove(callback) {
  *          The HTTP URL that we should call if an error occurs while sending SIP traffic towards your configured Origination URL
  * @param {string} [opts.disasterRecoveryMethod] -
  *          The HTTP method we should use to call the disaster_recovery_url
- * @param {trunk.recording_setting} [opts.recording] -
- *          The recording settings for the trunk
+ * @param {trunk.transfer_setting} [opts.transferMode] -
+ *          The call transfer settings for the trunk
  * @param {boolean} [opts.secure] -
  *          Whether Secure Trunking is enabled for the trunk
  * @param {boolean} [opts.cnamLookupEnabled] -
@@ -655,17 +657,16 @@ TrunkInstance.prototype.phoneNumbers = function phoneNumbers() {
 
 /* jshint ignore:start */
 /**
- * Access the terminatingSipDomains
+ * Access the recordings
  *
- * @function terminatingSipDomains
+ * @function recordings
  * @memberof Twilio.Trunking.V1.TrunkInstance#
  *
- * @returns {Twilio.Trunking.V1.TrunkContext.TerminatingSipDomainList}
+ * @returns {Twilio.Trunking.V1.TrunkContext.RecordingList}
  */
 /* jshint ignore:end */
-TrunkInstance.prototype.terminatingSipDomains = function terminatingSipDomains()
-    {
-  return this._proxy.terminatingSipDomains;
+TrunkInstance.prototype.recordings = function recordings() {
+  return this._proxy.recordings;
 };
 
 /* jshint ignore:start */
@@ -708,8 +709,8 @@ TrunkInstance.prototype[util.inspect.custom] = function inspect(depth, options)
  *          ipAccessControlLists resource
  * @property {Twilio.Trunking.V1.TrunkContext.PhoneNumberList} phoneNumbers -
  *          phoneNumbers resource
- * @property {Twilio.Trunking.V1.TrunkContext.TerminatingSipDomainList} terminatingSipDomains -
- *          terminatingSipDomains resource
+ * @property {Twilio.Trunking.V1.TrunkContext.RecordingList} recordings -
+ *          recordings resource
  *
  * @param {V1} version - Version of the resource
  * @param {sid} sid - The unique string that identifies the resource
@@ -727,7 +728,7 @@ TrunkContext = function TrunkContext(version, sid) {
   this._credentialsLists = undefined;
   this._ipAccessControlLists = undefined;
   this._phoneNumbers = undefined;
-  this._terminatingSipDomains = undefined;
+  this._recordings = undefined;
 };
 
 /* jshint ignore:start */
@@ -807,8 +808,8 @@ TrunkContext.prototype.remove = function remove(callback) {
  *          The HTTP URL that we should call if an error occurs while sending SIP traffic towards your configured Origination URL
  * @param {string} [opts.disasterRecoveryMethod] -
  *          The HTTP method we should use to call the disaster_recovery_url
- * @param {trunk.recording_setting} [opts.recording] -
- *          The recording settings for the trunk
+ * @param {trunk.transfer_setting} [opts.transferMode] -
+ *          The call transfer settings for the trunk
  * @param {boolean} [opts.secure] -
  *          Whether Secure Trunking is enabled for the trunk
  * @param {boolean} [opts.cnamLookupEnabled] -
@@ -831,7 +832,7 @@ TrunkContext.prototype.update = function update(opts, callback) {
     'DomainName': _.get(opts, 'domainName'),
     'DisasterRecoveryUrl': _.get(opts, 'disasterRecoveryUrl'),
     'DisasterRecoveryMethod': _.get(opts, 'disasterRecoveryMethod'),
-    'Recording': _.get(opts, 'recording'),
+    'TransferMode': _.get(opts, 'transferMode'),
     'Secure': serialize.bool(_.get(opts, 'secure')),
     'CnamLookupEnabled': serialize.bool(_.get(opts, 'cnamLookupEnabled'))
   });
@@ -855,52 +856,52 @@ TrunkContext.prototype.update = function update(opts, callback) {
 
 Object.defineProperty(TrunkContext.prototype,
   'originationUrls', {
-  get: function() {
-    if (!this._originationUrls) {
-      this._originationUrls = new OriginationUrlList(this._version, this._solution.sid);
+    get: function() {
+      if (!this._originationUrls) {
+        this._originationUrls = new OriginationUrlList(this._version, this._solution.sid);
+      }
+      return this._originationUrls;
     }
-    return this._originationUrls;
-  }
 });
 
 Object.defineProperty(TrunkContext.prototype,
   'credentialsLists', {
-  get: function() {
-    if (!this._credentialsLists) {
-      this._credentialsLists = new CredentialListList(this._version, this._solution.sid);
+    get: function() {
+      if (!this._credentialsLists) {
+        this._credentialsLists = new CredentialListList(this._version, this._solution.sid);
+      }
+      return this._credentialsLists;
     }
-    return this._credentialsLists;
-  }
 });
 
 Object.defineProperty(TrunkContext.prototype,
   'ipAccessControlLists', {
-  get: function() {
-    if (!this._ipAccessControlLists) {
-      this._ipAccessControlLists = new IpAccessControlListList(this._version, this._solution.sid);
+    get: function() {
+      if (!this._ipAccessControlLists) {
+        this._ipAccessControlLists = new IpAccessControlListList(this._version, this._solution.sid);
+      }
+      return this._ipAccessControlLists;
     }
-    return this._ipAccessControlLists;
-  }
 });
 
 Object.defineProperty(TrunkContext.prototype,
   'phoneNumbers', {
-  get: function() {
-    if (!this._phoneNumbers) {
-      this._phoneNumbers = new PhoneNumberList(this._version, this._solution.sid);
+    get: function() {
+      if (!this._phoneNumbers) {
+        this._phoneNumbers = new PhoneNumberList(this._version, this._solution.sid);
+      }
+      return this._phoneNumbers;
     }
-    return this._phoneNumbers;
-  }
 });
 
 Object.defineProperty(TrunkContext.prototype,
-  'terminatingSipDomains', {
-  get: function() {
-    if (!this._terminatingSipDomains) {
-      this._terminatingSipDomains = new TerminatingSipDomainList(this._version, this._solution.sid);
+  'recordings', {
+    get: function() {
+      if (!this._recordings) {
+        this._recordings = new RecordingList(this._version, this._solution.sid);
+      }
+      return this._recordings;
     }
-    return this._terminatingSipDomains;
-  }
 });
 
 /* jshint ignore:start */

@@ -470,7 +470,8 @@ ShortCodePage.prototype[util.inspect.custom] = function inspect(depth, options)
  *          The ISO 8601 date and time in GMT when the resource was last updated
  * @property {string} shortCode - The short code's number
  * @property {string} isoCountry - The ISO Country Code
- * @property {string} capabilities - The capabilities of the short code
+ * @property {PhoneNumberCapabilities} capabilities -
+ *          The capabilities of the short code
  * @property {string} url - The absolute URL of the ShortCode resource
  * @property {boolean} isReserved -
  *          Whether the short code should be reserved for manual assignment to participants only
@@ -504,13 +505,13 @@ ShortCodeInstance = function ShortCodeInstance(version, payload, serviceSid,
 
 Object.defineProperty(ShortCodeInstance.prototype,
   '_proxy', {
-  get: function() {
-    if (!this._context) {
-      this._context = new ShortCodeContext(this._version, this._solution.serviceSid, this._solution.sid);
-    }
+    get: function() {
+      if (!this._context) {
+        this._context = new ShortCodeContext(this._version, this._solution.serviceSid, this._solution.sid);
+      }
 
-    return this._context;
-  }
+      return this._context;
+    }
 });
 
 /* jshint ignore:start */

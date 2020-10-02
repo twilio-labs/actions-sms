@@ -318,6 +318,8 @@ SessionList = function SessionList(version, serviceSid) {
    * @param {session.status} [opts.status] - Session status
    * @param {object|list} [opts.participants] -
    *          The Participant objects to include in the new session
+   * @param {boolean} [opts.failOnParticipantConflict] -
+   *          An experimental parameter to override the ProxyAllowParticipantConflict account flag on a per-request basis.
    * @param {function} [callback] - Callback to handle processed record
    *
    * @returns {Promise} Resolves to processed SessionInstance
@@ -337,7 +339,8 @@ SessionList = function SessionList(version, serviceSid) {
       'Ttl': _.get(opts, 'ttl'),
       'Mode': _.get(opts, 'mode'),
       'Status': _.get(opts, 'status'),
-      'Participants': serialize.map(_.get(opts, 'participants'), function(e) { return serialize.object(e); })
+      'Participants': serialize.map(_.get(opts, 'participants'), function(e) { return serialize.object(e); }),
+      'FailOnParticipantConflict': serialize.bool(_.get(opts, 'failOnParticipantConflict'))
     });
 
     var promise = this._version.create({uri: this._uri, method: 'POST', data: data});
@@ -531,13 +534,13 @@ SessionInstance = function SessionInstance(version, payload, serviceSid, sid) {
 
 Object.defineProperty(SessionInstance.prototype,
   '_proxy', {
-  get: function() {
-    if (!this._context) {
-      this._context = new SessionContext(this._version, this._solution.serviceSid, this._solution.sid);
-    }
+    get: function() {
+      if (!this._context) {
+        this._context = new SessionContext(this._version, this._solution.serviceSid, this._solution.sid);
+      }
 
-    return this._context;
-  }
+      return this._context;
+    }
 });
 
 /* jshint ignore:start */
@@ -584,6 +587,8 @@ SessionInstance.prototype.remove = function remove(callback) {
  *          The ISO 8601 date when the Session should expire
  * @param {number} [opts.ttl] - When the session will expire
  * @param {session.status} [opts.status] - The new status of the resource
+ * @param {boolean} [opts.failOnParticipantConflict] -
+ *          An experimental parameter to override the ProxyAllowParticipantConflict account flag on a per-request basis.
  * @param {function} [callback] - Callback to handle processed record
  *
  * @returns {Promise} Resolves to processed SessionInstance
@@ -757,6 +762,8 @@ SessionContext.prototype.remove = function remove(callback) {
  *          The ISO 8601 date when the Session should expire
  * @param {number} [opts.ttl] - When the session will expire
  * @param {session.status} [opts.status] - The new status of the resource
+ * @param {boolean} [opts.failOnParticipantConflict] -
+ *          An experimental parameter to override the ProxyAllowParticipantConflict account flag on a per-request basis.
  * @param {function} [callback] - Callback to handle processed record
  *
  * @returns {Promise} Resolves to processed SessionInstance
@@ -773,7 +780,8 @@ SessionContext.prototype.update = function update(opts, callback) {
   var data = values.of({
     'DateExpiry': serialize.iso8601DateTime(_.get(opts, 'dateExpiry')),
     'Ttl': _.get(opts, 'ttl'),
-    'Status': _.get(opts, 'status')
+    'Status': _.get(opts, 'status'),
+    'FailOnParticipantConflict': serialize.bool(_.get(opts, 'failOnParticipantConflict'))
   });
 
   var promise = this._version.update({uri: this._uri, method: 'POST', data: data});
@@ -800,30 +808,30 @@ SessionContext.prototype.update = function update(opts, callback) {
 
 Object.defineProperty(SessionContext.prototype,
   'interactions', {
-  get: function() {
-    if (!this._interactions) {
-      this._interactions = new InteractionList(
-        this._version,
-        this._solution.serviceSid,
-        this._solution.sid
-      );
+    get: function() {
+      if (!this._interactions) {
+        this._interactions = new InteractionList(
+          this._version,
+          this._solution.serviceSid,
+          this._solution.sid
+        );
+      }
+      return this._interactions;
     }
-    return this._interactions;
-  }
 });
 
 Object.defineProperty(SessionContext.prototype,
   'participants', {
-  get: function() {
-    if (!this._participants) {
-      this._participants = new ParticipantList(
-        this._version,
-        this._solution.serviceSid,
-        this._solution.sid
-      );
+    get: function() {
+      if (!this._participants) {
+        this._participants = new ParticipantList(
+          this._version,
+          this._solution.serviceSid,
+          this._solution.sid
+        );
+      }
+      return this._participants;
     }
-    return this._participants;
-  }
 });
 
 /* jshint ignore:start */

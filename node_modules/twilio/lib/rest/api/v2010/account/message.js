@@ -70,11 +70,19 @@ MessageList = function MessageList(version, accountSid) {
    *          The total maximum price up to 4 decimal places in US dollars acceptable for the message to be delivered.
    * @param {boolean} [opts.provideFeedback] -
    *          Whether to confirm delivery of the message
+   * @param {number} [opts.attempt] -
+   *          Total numer of attempts made , this inclusive to send out the message
    * @param {number} [opts.validityPeriod] -
    *          The number of seconds that the message can remain in our outgoing queue.
    * @param {boolean} [opts.forceDelivery] - Reserved
+   * @param {message.content_retention} [opts.contentRetention] -
+   *          Determines if the message content can be stored or redacted based on privacy settings
+   * @param {message.address_retention} [opts.addressRetention] -
+   *          Determines if the address can be stored or obfuscated based on privacy settings
    * @param {boolean} [opts.smartEncoded] -
    *          Whether to detect Unicode characters that have a similar GSM-7 character and replace them
+   * @param {string|list} [opts.persistentAction] -
+   *          Rich actions for Channels Messages.
    * @param {string} [opts.from] - The phone number that initiated the message
    * @param {string} [opts.messagingServiceSid] -
    *          The SID of the Messaging Service you want to associate with the message.
@@ -106,9 +114,13 @@ MessageList = function MessageList(version, accountSid) {
       'ApplicationSid': _.get(opts, 'applicationSid'),
       'MaxPrice': _.get(opts, 'maxPrice'),
       'ProvideFeedback': serialize.bool(_.get(opts, 'provideFeedback')),
+      'Attempt': _.get(opts, 'attempt'),
       'ValidityPeriod': _.get(opts, 'validityPeriod'),
       'ForceDelivery': serialize.bool(_.get(opts, 'forceDelivery')),
-      'SmartEncoded': serialize.bool(_.get(opts, 'smartEncoded'))
+      'ContentRetention': _.get(opts, 'contentRetention'),
+      'AddressRetention': _.get(opts, 'addressRetention'),
+      'SmartEncoded': serialize.bool(_.get(opts, 'smartEncoded')),
+      'PersistentAction': serialize.map(_.get(opts, 'persistentAction'), function(e) { return e; })
     });
 
     var promise = this._version.create({uri: this._uri, method: 'POST', data: data});
@@ -505,34 +517,34 @@ MessagePage.prototype[util.inspect.custom] = function inspect(depth, options) {
  *
  * @constructor Twilio.Api.V2010.AccountContext.MessageInstance
  *
- * @property {string} accountSid - The SID of the Account that created the resource
- * @property {string} apiVersion - The API version used to process the message
  * @property {string} body - The message text
- * @property {Date} dateCreated -
- *          The RFC 2822 date and time in GMT that the resource was created
- * @property {Date} dateUpdated -
- *          The RFC 2822 date and time in GMT that the resource was last updated
- * @property {Date} dateSent -
- *          The RFC 2822 date and time in GMT when the message was sent
- * @property {message.direction} direction - The direction of the message
- * @property {number} errorCode - The error code associated with the message
- * @property {string} errorMessage - The description of the error_code
- * @property {string} from - The phone number that initiated the message
- * @property {string} messagingServiceSid -
- *          The SID of the Messaging Service used with the message.
- * @property {string} numMedia -
- *          The number of media files associated with the message
  * @property {string} numSegments -
  *          The number of messages used to deliver the message body
- * @property {string} price - The amount billed for the message
- * @property {string} priceUnit - The currency in which price is measured
- * @property {string} sid - The unique string that identifies the resource
- * @property {message.status} status - The status of the message
- * @property {string} subresourceUris -
- *          A list of related resources identified by their relative URIs
+ * @property {message.direction} direction - The direction of the message
+ * @property {string} from - The phone number that initiated the message
  * @property {string} to - The phone number that received the message
+ * @property {Date} dateUpdated -
+ *          The RFC 2822 date and time in GMT that the resource was last updated
+ * @property {string} price - The amount billed for the message
+ * @property {string} errorMessage - The description of the error_code
  * @property {string} uri -
  *          The URI of the resource, relative to `https://api.twilio.com`
+ * @property {string} accountSid - The SID of the Account that created the resource
+ * @property {string} numMedia -
+ *          The number of media files associated with the message
+ * @property {message.status} status - The status of the message
+ * @property {string} messagingServiceSid -
+ *          The SID of the Messaging Service used with the message.
+ * @property {string} sid - The unique string that identifies the resource
+ * @property {Date} dateSent -
+ *          The RFC 2822 date and time in GMT when the message was sent
+ * @property {Date} dateCreated -
+ *          The RFC 2822 date and time in GMT that the resource was created
+ * @property {number} errorCode - The error code associated with the message
+ * @property {string} priceUnit - The currency in which price is measured
+ * @property {string} apiVersion - The API version used to process the message
+ * @property {string} subresourceUris -
+ *          A list of related resources identified by their relative URIs
  *
  * @param {V2010} version - Version of the resource
  * @param {MessagePayload} payload - The instance payload
@@ -544,26 +556,26 @@ MessageInstance = function MessageInstance(version, payload, accountSid, sid) {
   this._version = version;
 
   // Marshaled Properties
-  this.accountSid = payload.account_sid; // jshint ignore:line
-  this.apiVersion = payload.api_version; // jshint ignore:line
   this.body = payload.body; // jshint ignore:line
-  this.dateCreated = deserialize.rfc2822DateTime(payload.date_created); // jshint ignore:line
-  this.dateUpdated = deserialize.rfc2822DateTime(payload.date_updated); // jshint ignore:line
-  this.dateSent = deserialize.rfc2822DateTime(payload.date_sent); // jshint ignore:line
-  this.direction = payload.direction; // jshint ignore:line
-  this.errorCode = deserialize.integer(payload.error_code); // jshint ignore:line
-  this.errorMessage = payload.error_message; // jshint ignore:line
-  this.from = payload.from; // jshint ignore:line
-  this.messagingServiceSid = payload.messaging_service_sid; // jshint ignore:line
-  this.numMedia = payload.num_media; // jshint ignore:line
   this.numSegments = payload.num_segments; // jshint ignore:line
-  this.price = payload.price; // jshint ignore:line
-  this.priceUnit = payload.price_unit; // jshint ignore:line
-  this.sid = payload.sid; // jshint ignore:line
-  this.status = payload.status; // jshint ignore:line
-  this.subresourceUris = payload.subresource_uris; // jshint ignore:line
+  this.direction = payload.direction; // jshint ignore:line
+  this.from = payload.from; // jshint ignore:line
   this.to = payload.to; // jshint ignore:line
+  this.dateUpdated = deserialize.rfc2822DateTime(payload.date_updated); // jshint ignore:line
+  this.price = payload.price; // jshint ignore:line
+  this.errorMessage = payload.error_message; // jshint ignore:line
   this.uri = payload.uri; // jshint ignore:line
+  this.accountSid = payload.account_sid; // jshint ignore:line
+  this.numMedia = payload.num_media; // jshint ignore:line
+  this.status = payload.status; // jshint ignore:line
+  this.messagingServiceSid = payload.messaging_service_sid; // jshint ignore:line
+  this.sid = payload.sid; // jshint ignore:line
+  this.dateSent = deserialize.rfc2822DateTime(payload.date_sent); // jshint ignore:line
+  this.dateCreated = deserialize.rfc2822DateTime(payload.date_created); // jshint ignore:line
+  this.errorCode = deserialize.integer(payload.error_code); // jshint ignore:line
+  this.priceUnit = payload.price_unit; // jshint ignore:line
+  this.apiVersion = payload.api_version; // jshint ignore:line
+  this.subresourceUris = payload.subresource_uris; // jshint ignore:line
 
   // Context
   this._context = undefined;
@@ -572,13 +584,13 @@ MessageInstance = function MessageInstance(version, payload, accountSid, sid) {
 
 Object.defineProperty(MessageInstance.prototype,
   '_proxy', {
-  get: function() {
-    if (!this._context) {
-      this._context = new MessageContext(this._version, this._solution.accountSid, this._solution.sid);
-    }
+    get: function() {
+      if (!this._context) {
+        this._context = new MessageContext(this._version, this._solution.accountSid, this._solution.sid);
+      }
 
-    return this._context;
-  }
+      return this._context;
+    }
 });
 
 /* jshint ignore:start */
@@ -830,22 +842,22 @@ MessageContext.prototype.update = function update(opts, callback) {
 
 Object.defineProperty(MessageContext.prototype,
   'media', {
-  get: function() {
-    if (!this._media) {
-      this._media = new MediaList(this._version, this._solution.accountSid, this._solution.sid);
+    get: function() {
+      if (!this._media) {
+        this._media = new MediaList(this._version, this._solution.accountSid, this._solution.sid);
+      }
+      return this._media;
     }
-    return this._media;
-  }
 });
 
 Object.defineProperty(MessageContext.prototype,
   'feedback', {
-  get: function() {
-    if (!this._feedback) {
-      this._feedback = new FeedbackList(this._version, this._solution.accountSid, this._solution.sid);
+    get: function() {
+      if (!this._feedback) {
+        this._feedback = new FeedbackList(this._version, this._solution.accountSid, this._solution.sid);
+      }
+      return this._feedback;
     }
-    return this._feedback;
-  }
 });
 
 /* jshint ignore:start */

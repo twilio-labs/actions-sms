@@ -8,7 +8,7 @@
 import Page = require('../../../../../base/Page');
 import Response = require('../../../../../http/response');
 import V2010 = require('../../../V2010');
-import serialize = require('../../../../../base/serialize');
+import { PhoneNumberCapabilities } from '../../../../../interfaces';
 import { SerializableClass } from '../../../../../interfaces';
 
 /**
@@ -33,10 +33,36 @@ interface MachineToMachineListInstance {
    * If a function is passed as the first argument, it will be used as the callback
    * function.
    *
+   * @param callback - Function to process each record
+   */
+  each(callback?: (item: MachineToMachineInstance, done: (err?: Error) => void) => void): void;
+  /**
+   * Streams MachineToMachineInstance records from the API.
+   *
+   * This operation lazily loads records as efficiently as possible until the limit
+   * is reached.
+   *
+   * The results are passed into the callback function, so this operation is memory
+   * efficient.
+   *
+   * If a function is passed as the first argument, it will be used as the callback
+   * function.
+   *
    * @param opts - Options for request
    * @param callback - Function to process each record
    */
   each(opts?: MachineToMachineListInstanceEachOptions, callback?: (item: MachineToMachineInstance, done: (err?: Error) => void) => void): void;
+  /**
+   * Retrieve a single target page of MachineToMachineInstance records from the API.
+   *
+   * The request is executed immediately.
+   *
+   * If a function is passed as the first argument, it will be used as the callback
+   * function.
+   *
+   * @param callback - Callback to handle list of records
+   */
+  getPage(callback?: (error: Error | null, items: MachineToMachinePage) => any): Promise<MachineToMachinePage>;
   /**
    * Retrieve a single target page of MachineToMachineInstance records from the API.
    *
@@ -55,10 +81,30 @@ interface MachineToMachineListInstance {
    * If a function is passed as the first argument, it will be used as the callback
    * function.
    *
+   * @param callback - Callback to handle list of records
+   */
+  list(callback?: (error: Error | null, items: MachineToMachineInstance[]) => any): Promise<MachineToMachineInstance[]>;
+  /**
+   * Lists MachineToMachineInstance records from the API as a list.
+   *
+   * If a function is passed as the first argument, it will be used as the callback
+   * function.
+   *
    * @param opts - Options for request
    * @param callback - Callback to handle list of records
    */
   list(opts?: MachineToMachineListInstanceOptions, callback?: (error: Error | null, items: MachineToMachineInstance[]) => any): Promise<MachineToMachineInstance[]>;
+  /**
+   * Retrieve a single page of MachineToMachineInstance records from the API.
+   *
+   * The request is executed immediately.
+   *
+   * If a function is passed as the first argument, it will be used as the callback
+   * function.
+   *
+   * @param callback - Callback to handle list of records
+   */
+  page(callback?: (error: Error | null, items: MachineToMachinePage) => any): Promise<MachineToMachinePage>;
   /**
    * Retrieve a single page of MachineToMachineInstance records from the API.
    *
@@ -248,7 +294,7 @@ interface MachineToMachinePayload extends MachineToMachineResource, Page.TwilioR
 interface MachineToMachineResource {
   address_requirements: string;
   beta: boolean;
-  capabilities: string;
+  capabilities: PhoneNumberCapabilities;
   friendly_name: string;
   iso_country: string;
   lata: string;
@@ -280,7 +326,7 @@ declare class MachineToMachineInstance extends SerializableClass {
 
   addressRequirements: string;
   beta: boolean;
-  capabilities: string;
+  capabilities: PhoneNumberCapabilities;
   friendlyName: string;
   isoCountry: string;
   lata: string;

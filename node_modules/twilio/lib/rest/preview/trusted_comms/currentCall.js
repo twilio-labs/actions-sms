@@ -169,22 +169,22 @@ CurrentCallPage.prototype[util.inspect.custom] = function inspect(depth,
  *
  * @constructor Twilio.Preview.TrustedComms.CurrentCallInstance
  *
- * @property {string} sid -
- *          A string that uniquely identifies this current phone call.
- * @property {string} from - The originating phone number
- * @property {string} to - The terminating phone number
- * @property {string} status - The status of the current phone call
- * @property {string} reason - The business reason for this current phone call
- * @property {Date} createdAt - The date this current phone call was created
- * @property {string} caller - Caller name of the current phone call
- * @property {string} logo - Logo URL of the caller
  * @property {string} bgColor - Background color of the current phone call
+ * @property {string} caller - Caller name of the current phone call
+ * @property {Date} createdAt - The date this current phone call was created
  * @property {string} fontColor - Font color of the current phone call
- * @property {string} useCase - The use case for the current phone call
+ * @property {string} from - The originating phone number
+ * @property {string} logo - Logo URL of the caller
  * @property {string} manager - The name of the CPS organization
+ * @property {string} reason - The business reason for this current phone call
  * @property {string} shieldImg -
  *          Shield image URL that serves as authenticity proof of the current phone call
+ * @property {string} sid -
+ *          A string that uniquely identifies this current branded phone call.
+ * @property {string} status - The status of the current phone call
+ * @property {string} to - The terminating phone number
  * @property {string} url - The URL of this resource.
+ * @property {string} useCase - The use case for the current phone call
  *
  * @param {TrustedComms} version - Version of the resource
  * @param {CurrentCallPayload} payload - The instance payload
@@ -194,20 +194,20 @@ CurrentCallInstance = function CurrentCallInstance(version, payload) {
   this._version = version;
 
   // Marshaled Properties
-  this.sid = payload.sid; // jshint ignore:line
-  this.from = payload.from; // jshint ignore:line
-  this.to = payload.to; // jshint ignore:line
-  this.status = payload.status; // jshint ignore:line
-  this.reason = payload.reason; // jshint ignore:line
-  this.createdAt = deserialize.iso8601DateTime(payload.created_at); // jshint ignore:line
-  this.caller = payload.caller; // jshint ignore:line
-  this.logo = payload.logo; // jshint ignore:line
   this.bgColor = payload.bg_color; // jshint ignore:line
+  this.caller = payload.caller; // jshint ignore:line
+  this.createdAt = deserialize.iso8601DateTime(payload.created_at); // jshint ignore:line
   this.fontColor = payload.font_color; // jshint ignore:line
-  this.useCase = payload.use_case; // jshint ignore:line
+  this.from = payload.from; // jshint ignore:line
+  this.logo = payload.logo; // jshint ignore:line
   this.manager = payload.manager; // jshint ignore:line
+  this.reason = payload.reason; // jshint ignore:line
   this.shieldImg = payload.shield_img; // jshint ignore:line
+  this.sid = payload.sid; // jshint ignore:line
+  this.status = payload.status; // jshint ignore:line
+  this.to = payload.to; // jshint ignore:line
   this.url = payload.url; // jshint ignore:line
+  this.useCase = payload.use_case; // jshint ignore:line
 
   // Context
   this._context = undefined;
@@ -216,13 +216,13 @@ CurrentCallInstance = function CurrentCallInstance(version, payload) {
 
 Object.defineProperty(CurrentCallInstance.prototype,
   '_proxy', {
-  get: function() {
-    if (!this._context) {
-      this._context = new CurrentCallContext(this._version);
-    }
+    get: function() {
+      if (!this._context) {
+        this._context = new CurrentCallContext(this._version);
+      }
 
-    return this._context;
-  }
+      return this._context;
+    }
 });
 
 /* jshint ignore:start */
@@ -232,13 +232,18 @@ Object.defineProperty(CurrentCallInstance.prototype,
  * @function fetch
  * @memberof Twilio.Preview.TrustedComms.CurrentCallInstance#
  *
+ * @param {object} [opts] - Options for request
+ * @param {string} [opts.xXcnamSensitivePhoneNumberFrom] -
+ *          The originating Phone Number
+ * @param {string} [opts.xXcnamSensitivePhoneNumberTo] -
+ *          The terminating Phone Number
  * @param {function} [callback] - Callback to handle processed record
  *
  * @returns {Promise} Resolves to processed CurrentCallInstance
  */
 /* jshint ignore:end */
-CurrentCallInstance.prototype.fetch = function fetch(callback) {
-  return this._proxy.fetch(callback);
+CurrentCallInstance.prototype.fetch = function fetch(opts, callback) {
+  return this._proxy.fetch(opts, callback);
 };
 
 /* jshint ignore:start */
@@ -295,14 +300,30 @@ CurrentCallContext = function CurrentCallContext(version) {
  * @function fetch
  * @memberof Twilio.Preview.TrustedComms.CurrentCallContext#
  *
+ * @param {object} [opts] - Options for request
+ * @param {string} [opts.xXcnamSensitivePhoneNumberFrom] -
+ *          The originating Phone Number
+ * @param {string} [opts.xXcnamSensitivePhoneNumberTo] -
+ *          The terminating Phone Number
  * @param {function} [callback] - Callback to handle processed record
  *
  * @returns {Promise} Resolves to processed CurrentCallInstance
  */
 /* jshint ignore:end */
-CurrentCallContext.prototype.fetch = function fetch(callback) {
+CurrentCallContext.prototype.fetch = function fetch(opts, callback) {
+  if (_.isFunction(opts)) {
+    callback = opts;
+    opts = {};
+  }
+  opts = opts || {};
+
   var deferred = Q.defer();
-  var promise = this._version.fetch({uri: this._uri, method: 'GET'});
+  var headers = values.of({
+    'X-Xcnam-Sensitive-Phone-Number-From': _.get(opts, 'xXcnamSensitivePhoneNumberFrom'),
+    'X-Xcnam-Sensitive-Phone-Number-To': _.get(opts, 'xXcnamSensitivePhoneNumberTo')
+  });
+
+  var promise = this._version.fetch({uri: this._uri, method: 'GET', headers: headers});
 
   promise = promise.then(function(payload) {
     deferred.resolve(new CurrentCallInstance(this._version, payload));

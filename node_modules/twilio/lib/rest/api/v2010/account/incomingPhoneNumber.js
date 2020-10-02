@@ -382,6 +382,8 @@ IncomingPhoneNumberList = function IncomingPhoneNumberList(version, accountSid)
    *          The SID of the Address resource associated with the phone number
    * @param {incoming_phone_number.voice_receive_mode} [opts.voiceReceiveMode] -
    *          Incoming call type: fax or voice
+   * @param {string} [opts.bundleSid] -
+   *          The SID of the Bundle resource associated with number
    * @param {string} [opts.phoneNumber] -
    *          The phone number to purchase in E.164 format
    * @param {string} [opts.areaCode] - The desired area code for the new phone number
@@ -421,7 +423,8 @@ IncomingPhoneNumberList = function IncomingPhoneNumberList(version, accountSid)
       'TrunkSid': _.get(opts, 'trunkSid'),
       'IdentitySid': _.get(opts, 'identitySid'),
       'AddressSid': _.get(opts, 'addressSid'),
-      'VoiceReceiveMode': _.get(opts, 'voiceReceiveMode')
+      'VoiceReceiveMode': _.get(opts, 'voiceReceiveMode'),
+      'BundleSid': _.get(opts, 'bundleSid')
     });
 
     var promise = this._version.create({uri: this._uri, method: 'POST', data: data});
@@ -464,35 +467,35 @@ IncomingPhoneNumberList = function IncomingPhoneNumberList(version, accountSid)
 
   Object.defineProperty(IncomingPhoneNumberListInstance,
     'local', {
-    get: function local() {
-      if (!this._local) {
-        this._local = new LocalList(this._version, this._solution.accountSid);
-      }
+      get: function local() {
+        if (!this._local) {
+          this._local = new LocalList(this._version, this._solution.accountSid);
+        }
 
-      return this._local;
-    }
+        return this._local;
+      }
   });
 
   Object.defineProperty(IncomingPhoneNumberListInstance,
     'mobile', {
-    get: function mobile() {
-      if (!this._mobile) {
-        this._mobile = new MobileList(this._version, this._solution.accountSid);
-      }
+      get: function mobile() {
+        if (!this._mobile) {
+          this._mobile = new MobileList(this._version, this._solution.accountSid);
+        }
 
-      return this._mobile;
-    }
+        return this._mobile;
+      }
   });
 
   Object.defineProperty(IncomingPhoneNumberListInstance,
     'tollFree', {
-    get: function tollFree() {
-      if (!this._tollFree) {
-        this._tollFree = new TollFreeList(this._version, this._solution.accountSid);
-      }
+      get: function tollFree() {
+        if (!this._tollFree) {
+          this._tollFree = new TollFreeList(this._version, this._solution.accountSid);
+        }
 
-      return this._tollFree;
-    }
+        return this._tollFree;
+      }
   });
 
   /* jshint ignore:start */
@@ -599,7 +602,7 @@ IncomingPhoneNumberPage.prototype[util.inspect.custom] = function inspect(depth,
  *          The API version used to start a new TwiML session
  * @property {boolean} beta -
  *          Whether the phone number is new to the Twilio platform
- * @property {string} capabilities -
+ * @property {PhoneNumberCapabilities} capabilities -
  *          Indicate if a phone can receive calls or messages
  * @property {Date} dateCreated -
  *          The RFC 2822 date and time in GMT that the resource was created
@@ -629,6 +632,8 @@ IncomingPhoneNumberPage.prototype[util.inspect.custom] = function inspect(depth,
  *          The SID of the Trunk that handles calls to the phone number
  * @property {string} uri -
  *          The URI of the resource, relative to `https://api.twilio.com`
+ * @property {incoming_phone_number.voice_receive_mode} voiceReceiveMode -
+ *          The voice_receive_mode
  * @property {string} voiceApplicationSid -
  *          The SID of the application that handles calls to the phone number
  * @property {boolean} voiceCallerIdLookup - Whether to lookup the caller's name
@@ -643,6 +648,9 @@ IncomingPhoneNumberPage.prototype[util.inspect.custom] = function inspect(depth,
  *          Whether the phone number is enabled for emergency calling
  * @property {string} emergencyAddressSid -
  *          The emergency address configuration to use for emergency calling
+ * @property {string} bundleSid -
+ *          The SID of the Bundle resource associated with number
+ * @property {string} status - The status
  *
  * @param {V2010} version - Version of the resource
  * @param {IncomingPhoneNumberPayload} payload - The instance payload
@@ -677,6 +685,7 @@ IncomingPhoneNumberInstance = function IncomingPhoneNumberInstance(version,
   this.statusCallbackMethod = payload.status_callback_method; // jshint ignore:line
   this.trunkSid = payload.trunk_sid; // jshint ignore:line
   this.uri = payload.uri; // jshint ignore:line
+  this.voiceReceiveMode = payload.voice_receive_mode; // jshint ignore:line
   this.voiceApplicationSid = payload.voice_application_sid; // jshint ignore:line
   this.voiceCallerIdLookup = payload.voice_caller_id_lookup; // jshint ignore:line
   this.voiceFallbackMethod = payload.voice_fallback_method; // jshint ignore:line
@@ -685,6 +694,8 @@ IncomingPhoneNumberInstance = function IncomingPhoneNumberInstance(version,
   this.voiceUrl = payload.voice_url; // jshint ignore:line
   this.emergencyStatus = payload.emergency_status; // jshint ignore:line
   this.emergencyAddressSid = payload.emergency_address_sid; // jshint ignore:line
+  this.bundleSid = payload.bundle_sid; // jshint ignore:line
+  this.status = payload.status; // jshint ignore:line
 
   // Context
   this._context = undefined;
@@ -693,17 +704,17 @@ IncomingPhoneNumberInstance = function IncomingPhoneNumberInstance(version,
 
 Object.defineProperty(IncomingPhoneNumberInstance.prototype,
   '_proxy', {
-  get: function() {
-    if (!this._context) {
-      this._context = new IncomingPhoneNumberContext(
-        this._version,
-        this._solution.accountSid,
-        this._solution.sid
-      );
-    }
+    get: function() {
+      if (!this._context) {
+        this._context = new IncomingPhoneNumberContext(
+          this._version,
+          this._solution.accountSid,
+          this._solution.sid
+        );
+      }
 
-    return this._context;
-  }
+      return this._context;
+    }
 });
 
 /* jshint ignore:start */
@@ -755,6 +766,8 @@ Object.defineProperty(IncomingPhoneNumberInstance.prototype,
  *          Unique string that identifies the identity associated with number
  * @param {string} [opts.addressSid] -
  *          The SID of the Address resource associated with the phone number
+ * @param {string} [opts.bundleSid] -
+ *          The SID of the Bundle resource associated with number
  * @param {function} [callback] - Callback to handle processed record
  *
  * @returns {Promise} Resolves to processed IncomingPhoneNumberInstance
@@ -913,6 +926,8 @@ IncomingPhoneNumberContext = function IncomingPhoneNumberContext(version,
  *          Unique string that identifies the identity associated with number
  * @param {string} [opts.addressSid] -
  *          The SID of the Address resource associated with the phone number
+ * @param {string} [opts.bundleSid] -
+ *          The SID of the Bundle resource associated with number
  * @param {function} [callback] - Callback to handle processed record
  *
  * @returns {Promise} Resolves to processed IncomingPhoneNumberInstance
@@ -948,7 +963,8 @@ IncomingPhoneNumberContext.prototype.update = function update(opts, callback) {
     'TrunkSid': _.get(opts, 'trunkSid'),
     'VoiceReceiveMode': _.get(opts, 'voiceReceiveMode'),
     'IdentitySid': _.get(opts, 'identitySid'),
-    'AddressSid': _.get(opts, 'addressSid')
+    'AddressSid': _.get(opts, 'addressSid'),
+    'BundleSid': _.get(opts, 'bundleSid')
   });
 
   var promise = this._version.update({uri: this._uri, method: 'POST', data: data});
@@ -1042,16 +1058,16 @@ IncomingPhoneNumberContext.prototype.remove = function remove(callback) {
 
 Object.defineProperty(IncomingPhoneNumberContext.prototype,
   'assignedAddOns', {
-  get: function() {
-    if (!this._assignedAddOns) {
-      this._assignedAddOns = new AssignedAddOnList(
-        this._version,
-        this._solution.accountSid,
-        this._solution.sid
-      );
+    get: function() {
+      if (!this._assignedAddOns) {
+        this._assignedAddOns = new AssignedAddOnList(
+          this._version,
+          this._solution.accountSid,
+          this._solution.sid
+        );
+      }
+      return this._assignedAddOns;
     }
-    return this._assignedAddOns;
-  }
 });
 
 /* jshint ignore:start */

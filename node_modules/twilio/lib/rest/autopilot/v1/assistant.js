@@ -536,13 +536,13 @@ AssistantInstance = function AssistantInstance(version, payload, sid) {
 
 Object.defineProperty(AssistantInstance.prototype,
   '_proxy', {
-  get: function() {
-    if (!this._context) {
-      this._context = new AssistantContext(this._version, this._solution.sid);
-    }
+    get: function() {
+      if (!this._context) {
+        this._context = new AssistantContext(this._version, this._solution.sid);
+      }
 
-    return this._context;
-  }
+      return this._context;
+    }
 });
 
 /* jshint ignore:start */
@@ -579,7 +579,7 @@ AssistantInstance.prototype.fetch = function fetch(callback) {
  * @param {object} [opts.styleSheet] -
  *          A JSON string that defines the Assistant's style sheet
  * @param {object} [opts.defaults] -
- *          A JSON object that defines the Assistant's [default tasks](https://www.twilio.com/docs/autopilot/api/assistant/defaults) for various scenarios
+ *          A JSON object that defines the Assistant's {@link https://www.twilio.com/docs/autopilot/api/assistant/defaults|default tasks} for various scenarios
  * @param {string} [opts.developmentStage] -
  *          A string describing the state of the assistant.
  * @param {function} [callback] - Callback to handle processed record
@@ -842,7 +842,7 @@ AssistantContext.prototype.fetch = function fetch(callback) {
  * @param {object} [opts.styleSheet] -
  *          A JSON string that defines the Assistant's style sheet
  * @param {object} [opts.defaults] -
- *          A JSON object that defines the Assistant's [default tasks](https://www.twilio.com/docs/autopilot/api/assistant/defaults) for various scenarios
+ *          A JSON object that defines the Assistant's {@link https://www.twilio.com/docs/autopilot/api/assistant/defaults|default tasks} for various scenarios
  * @param {string} [opts.developmentStage] -
  *          A string describing the state of the assistant.
  * @param {function} [callback] - Callback to handle processed record
@@ -919,82 +919,82 @@ AssistantContext.prototype.remove = function remove(callback) {
 
 Object.defineProperty(AssistantContext.prototype,
   'fieldTypes', {
-  get: function() {
-    if (!this._fieldTypes) {
-      this._fieldTypes = new FieldTypeList(this._version, this._solution.sid);
+    get: function() {
+      if (!this._fieldTypes) {
+        this._fieldTypes = new FieldTypeList(this._version, this._solution.sid);
+      }
+      return this._fieldTypes;
     }
-    return this._fieldTypes;
-  }
 });
 
 Object.defineProperty(AssistantContext.prototype,
   'tasks', {
-  get: function() {
-    if (!this._tasks) {
-      this._tasks = new TaskList(this._version, this._solution.sid);
+    get: function() {
+      if (!this._tasks) {
+        this._tasks = new TaskList(this._version, this._solution.sid);
+      }
+      return this._tasks;
     }
-    return this._tasks;
-  }
 });
 
 Object.defineProperty(AssistantContext.prototype,
   'modelBuilds', {
-  get: function() {
-    if (!this._modelBuilds) {
-      this._modelBuilds = new ModelBuildList(this._version, this._solution.sid);
+    get: function() {
+      if (!this._modelBuilds) {
+        this._modelBuilds = new ModelBuildList(this._version, this._solution.sid);
+      }
+      return this._modelBuilds;
     }
-    return this._modelBuilds;
-  }
 });
 
 Object.defineProperty(AssistantContext.prototype,
   'queries', {
-  get: function() {
-    if (!this._queries) {
-      this._queries = new QueryList(this._version, this._solution.sid);
+    get: function() {
+      if (!this._queries) {
+        this._queries = new QueryList(this._version, this._solution.sid);
+      }
+      return this._queries;
     }
-    return this._queries;
-  }
 });
 
 Object.defineProperty(AssistantContext.prototype,
   'styleSheet', {
-  get: function() {
-    if (!this._styleSheet) {
-      this._styleSheet = new StyleSheetList(this._version, this._solution.sid);
+    get: function() {
+      if (!this._styleSheet) {
+        this._styleSheet = new StyleSheetList(this._version, this._solution.sid);
+      }
+      return this._styleSheet;
     }
-    return this._styleSheet;
-  }
 });
 
 Object.defineProperty(AssistantContext.prototype,
   'defaults', {
-  get: function() {
-    if (!this._defaults) {
-      this._defaults = new DefaultsList(this._version, this._solution.sid);
+    get: function() {
+      if (!this._defaults) {
+        this._defaults = new DefaultsList(this._version, this._solution.sid);
+      }
+      return this._defaults;
     }
-    return this._defaults;
-  }
 });
 
 Object.defineProperty(AssistantContext.prototype,
   'dialogues', {
-  get: function() {
-    if (!this._dialogues) {
-      this._dialogues = new DialogueList(this._version, this._solution.sid);
+    get: function() {
+      if (!this._dialogues) {
+        this._dialogues = new DialogueList(this._version, this._solution.sid);
+      }
+      return this._dialogues;
     }
-    return this._dialogues;
-  }
 });
 
 Object.defineProperty(AssistantContext.prototype,
   'webhooks', {
-  get: function() {
-    if (!this._webhooks) {
-      this._webhooks = new WebhookList(this._version, this._solution.sid);
+    get: function() {
+      if (!this._webhooks) {
+        this._webhooks = new WebhookList(this._version, this._solution.sid);
+      }
+      return this._webhooks;
     }
-    return this._webhooks;
-  }
 });
 
 /* jshint ignore:start */
