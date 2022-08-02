@@ -28,35 +28,24 @@ Send an SMS from GitHub Actions.
 
 ## Inputs
 
-### `fromPhoneNumber`
+| Input                                          | Description                                                                                                               |  Required|
+| :--------------------------------------- | :------------------------------------------------------------------------------------------------------| :--------------|
+|  ```fromPhoneNumber ```  | Phone number in your Twilio account to send the SMS from                  |      True      |
+| ```toPhoneNumber ```        | Phone number to send the SMS to	                                                                  |      True     |
+| ```message ```	                    | The message you want to send                                                                         |      True     |
+|  ```TWILIO_ACCOUNT_SID ```  | A Twilio Account SID. Can alternatively be stored in environment |      True     |
+| ```TWILIO_API_KEY ```        |  A Twilio API Secret. Can alternatively be stored in environment          |      True     |
+| ```TWILIO_API_SECRET ```	   | A Twilio API Secret. Can alternatively be stored in environment       |      True     |
 
-**Required** Phone number in your Twilio account to send the SMS from
 
-### `toPhoneNumber`
-
-**Required** Phone number to send the SMS to
-
-### `message`
-
-**Required** The message you want to send
-
-### `TWILIO_ACCOUNT_SID`
-
-A Twilio Account SID. Can alternatively be stored in environment
-
-### `TWILIO_API_KEY`
-
-A Twilio API Key. Can alternatively be stored in environment
-
-### `TWILIO_API_SECRET`
-
-A Twilio API Secret. Can alternatively be stored in environment
 
 ## Outputs
 
-### `messageSid`
+| Output                                          | Description                                                   
+| :--------------------------------------- | :------------------------------------------------------------------------------------------------------| 
+|  ```messageSid ```  | The SID of the [message resource](https://www.twilio.com/docs/sms/api/message-resource#message-properties) associated with the SMS sent.  | 
 
-The SID of the [message resource](https://www.twilio.com/docs/sms/api/message-resource#message-properties) associated with the SMS sent.
+
 
 ## Contributing
 
