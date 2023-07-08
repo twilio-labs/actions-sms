@@ -25,11 +25,11 @@
   "homepage": "https://github.com/twilio-labs/actions-sms#readme",
   "dependencies": {
     "@actions/core": "^1.1.0",
-    "twilio": "^3.34.0"
+    "twilio": "^3.84.1"
   },
   "devDependencies": {
     "husky": "^3.0.5",
-    "jest": "^24.9.0",
+    "jest": "^29.6.1",
     "typescript": "^3.6.3"
   },
   "husky": {
