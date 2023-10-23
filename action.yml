@@ -24,7 +24,7 @@ outputs:
   messageSid:
     description: 'The Twilio Message SID'
 runs:
-  using: 'node12'
+  using: 'node16'
   main: 'dist/main.js'
 branding:
   color: 'red'
