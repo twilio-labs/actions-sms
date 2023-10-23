@@ -28,8 +28,8 @@ async function run() {
 
 async function execute() {
   try {
-    return await run();
-  } catch({ message }) {
+    return await run(); //@ts-ignore
+  } catch({ message }) { 
     core.error('Failed to send message', message);
     core.setFailed(message);
   }

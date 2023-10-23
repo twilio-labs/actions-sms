@@ -21,7 +21,7 @@ async function run() {
 }
 async function execute() {
     try {
-        return await run();
+        return await run(); //@ts-ignore
     }
     catch ({ message }) {
         core.error('Failed to send message', message);
