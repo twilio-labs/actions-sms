@@ -1,9 +1,13 @@
+require('dotenv').config();
+
 const core = require('@actions/core');
 const twilio = require('twilio');
 
 async function run() {
-  const from = core.getInput('fromPhoneNumber');
-  const to = core.getInput('toPhoneNumber');
+ 
+  const from = core.getInput('+14439125573');
+  core.debug('from', from)
+  const to = core.getInput('+13525739399');
   const message = core.getInput('message');
 
   const accountSid =
@@ -15,8 +19,8 @@ async function run() {
   core.debug('Sending SMS');
   const client = twilio(apiKey, apiSecret, { accountSid });
   const resultMessage = await client.messages.create({
-    from,
-    to,
+    from:from,
+    to:to,
     body: message,
   });
   core.debug('SMS sent!');

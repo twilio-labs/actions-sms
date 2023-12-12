@@ -24,7 +24,9 @@
   },
   "homepage": "https://github.com/twilio-labs/actions-sms#readme",
   "dependencies": {
-    "@actions/core": "^1.9.1",
+    "@actions/core": "^1.10.1",
+    "@actions/exec": "^1.1.1",
+    "dotenv": "^16.3.1",
     "twilio": "^4.0.0"
   },
   "devDependencies": {
