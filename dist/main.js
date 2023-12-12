@@ -15,7 +15,7 @@ async function run() {
         to,
         body: message,
     });
-    core.debug('SMS sent!');
+    core.debug('SMS sent');
     core.setOutput('messageSid', resultMessage.sid);
     return resultMessage;
 }
