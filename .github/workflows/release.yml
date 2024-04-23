@@ -1,0 +1,14 @@
+#on:
+#  push:
+#    tags:
+#      - "v*"
+
+on: create
+
+name: Release
+jobs:
+  release:
+    name: Release GitHub Actions
+    runs-on: ubuntu-latest
+    steps:
+      - uses: technote-space/release-github-actions@v6
