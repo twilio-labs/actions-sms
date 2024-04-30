@@ -114,7 +114,7 @@ declare namespace dayjs {
      * ```
      * Docs: https://day.js.org/docs/en/get-set/day
      */
-    day(): number
+    day(): 0 | 1 | 2 | 3 | 4 | 5 | 6
     /**
      * Set the day of the week.
      *
@@ -382,7 +382,7 @@ declare namespace dayjs {
      *
      * Docs: https://day.js.org/docs/en/query/is-before
      */
-    isBefore(date: ConfigType, unit?: OpUnitType): boolean
+    isBefore(date?: ConfigType, unit?: OpUnitType): boolean
     /**
      * This indicates whether the Day.js object is the same as the other supplied date-time.
      * ```
@@ -394,7 +394,7 @@ declare namespace dayjs {
      * ```
      * Docs: https://day.js.org/docs/en/query/is-same
      */
-    isSame(date: ConfigType, unit?: OpUnitType): boolean
+    isSame(date?: ConfigType, unit?: OpUnitType): boolean
     /**
      * This indicates whether the Day.js object is after the other supplied date-time.
      * ```
@@ -408,7 +408,7 @@ declare namespace dayjs {
      *
      * Docs: https://day.js.org/docs/en/query/is-after
      */
-    isAfter(date: ConfigType, unit?: OpUnitType): boolean
+    isAfter(date?: ConfigType, unit?: OpUnitType): boolean
 
     locale(): string
 
