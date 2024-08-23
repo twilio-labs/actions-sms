@@ -7,7 +7,9 @@
     "build": "tsc",
     "test": "npm run build && jest",
     "dev:install": "rm --rf node_modules && npm install",
-    "actions:install": "rm -rf node_modules && npm install --omit=dev",
+    "prod:install": "rm -rf node_modules && npm install --omit=dev",
+    "setup:dev": "npm run dev:install && npm run test",
+    "setup:prod": "npm run prod:install && npm run test",
     "dependencyUpdate": "npx npm-check-updates -u && npm install"
   },
   "repository": {
@@ -32,14 +34,7 @@
   },
   "devDependencies": {
     "@types/node": "^22.1.0",
-    "husky": "^9.1.4",
     "jest": "^29.7.0",
     "typescript": "^5.5.4"
-  },
-  "husky": {
-    "skipCI": true,
-    "hooks": {
-      "post-commit": "npm prune --production && git add node_modules/* && git commit -m \"chore: update node_modules\" && npm install"
-    }
   }
 }
