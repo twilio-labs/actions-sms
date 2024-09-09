@@ -5,11 +5,11 @@ Send an SMS from GitHub Actions.
 ## Prerequisites
 
 - A Twilio Account. [Sign up for free](https://www.twilio.com/try-twilio)
-- A [Twilio API Key and Secret](https://www.twilio.com/docs/iam/keys/api-key)
+- A [Twilio Auth Token](https://www.twilio.com/docs/iam/api/authtoken)
 
 ## Usage
 
-1. Set up your credentials as secrets in your repository settings using `TWILIO_ACCOUNT_SID`, `TWILIO_API_KEY`, `TWILIO_API_SECRET`
+1. Set up your credentials as secrets in your repository settings using `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TO_PHONE_NUMBER`, `FROM_PHONE_NUMBER` 
 
 2. Add the following to your workflow
 
@@ -32,8 +32,8 @@ jobs:
       - name: 'Sending SMS Notification'
         uses: twilio-labs/actions-sms@v1
         with:
-          fromPhoneNumber: '+12345678900' # alternatively, use a Repository Secret
-          toPhoneNumber: '+12345678900' # alternatively, use a Repository Secret
+          fromPhoneNumber: ${{ secrets.FROM_PHONE_NUMBER }} # alternatively, use a Repository Secret
+          toPhoneNumber: ${{ secrets.TO_PHONE_NUMBER }} # alternatively, use a Repository Secret
           message: 'Hello from Twilio'
 ```
 
@@ -55,13 +55,9 @@ jobs:
 
 A Twilio Account SID. Can alternatively be stored in environment
 
-### `TWILIO_API_KEY`
+### `TWILIO_AUTH_TOKEN`
 
-A Twilio API Key. Can alternatively be stored in environment
-
-### `TWILIO_API_SECRET`
-
-A Twilio API Secret. Can alternatively be stored in environment
+A Twilio Auth Token. Can alternatively be stored in environment
 
 ## Outputs
 
