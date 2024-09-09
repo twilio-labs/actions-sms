@@ -2,10 +2,10 @@ name: 'Twilio SMS'
 author: 'Twilio Labs'
 description: 'Send an SMS from GitHub Actions using Twilio Programmable SMS'
 inputs:
-  fromPhoneNumber:
+  FROM_PHONE_NUMBER:
     description: 'Phone number in your Twilio account to send the SMS from'
     required: true
-  toPhoneNumber:
+  TO_PHONE_NUMBER:
     description: 'Phone number to send the SMS to'
     required: true
   message:
@@ -14,11 +14,8 @@ inputs:
   TWILIO_ACCOUNT_SID:
     description: 'A Twilio Account SID. Can alternatively be stored in environment'
     required: true
-  TWILIO_API_KEY:
-    description: 'A Twilio API Key. Can alternatively be stored in environment'
-    required: true
-  TWILIO_API_SECRET:
-    description: 'A Twilio API Secret. Can alternatively be stored in environment'
+  TWILIO_AUTH_TOKEN:
+    description: 'A Twilio Auth Token. Can alternatively be stored in environment'
     required: true
 outputs:
   messageSid:
