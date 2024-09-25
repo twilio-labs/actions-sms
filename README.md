@@ -6,6 +6,7 @@ Send an SMS from GitHub Actions.
 
 - A Twilio Account. [Sign up for free](https://www.twilio.com/try-twilio)
 - A [Twilio Auth Token](https://www.twilio.com/docs/iam/api/authtoken)
+- A [Registered Phone Number](https://www.twilio.com/docs/phone-numbers/regulatory/faq) 
 
 ## Usage
 
@@ -14,14 +15,14 @@ Send an SMS from GitHub Actions.
 2. Add the following to your workflow
 
 ```yml
-name: Twilio Sned
+name: Twilio Send
 on:
   workflow_dispatch: # allows you to manually trigger the workflow
   schedule: # runs on a cron, nightly
     - cron: 0 0 * * * 
 env:
     TWILIO_ACCOUNT_SID: ${{ secrets.TWILIO_ACCOUNT_SID }}
-    TWILIO_API_KEY: ${{ secrets.TWILIO_API_KEY }}
+    TWILIO_AUTH_TOKEN: ${{ secrets.TWILIO_AUTH_TOKEN }}
     TWILIO_API_SECRET: ${{ secrets.TWILIO_API_SECRET }}
 permissions:
   contents: read
@@ -32,18 +33,18 @@ jobs:
       - name: 'Sending SMS Notification'
         uses: twilio-labs/actions-sms@v1
         with:
-          fromPhoneNumber: ${{ secrets.FROM_PHONE_NUMBER }} # alternatively, use a Repository Secret
-          toPhoneNumber: ${{ secrets.TO_PHONE_NUMBER }} # alternatively, use a Repository Secret
+          FROM_PHONE_NUMBER: ${{ secrets.FROM_PHONE_NUMBER }} 
+          TO_PHONE_NUMBER: ${{ secrets.TO_PHONE_NUMBER }} 
           message: 'Hello from Twilio'
 ```
 
 ## Inputs
 
-### `fromPhoneNumber`
+### `FROM_PHONE_NUMBER`
 
 **Required** Phone number in your Twilio account to send the SMS from
 
-### `toPhoneNumber`
+### `TO_PHONE_NUMBER`
 
 **Required** Phone number to send the SMS to
 
