@@ -5,23 +5,24 @@ Send an SMS from GitHub Actions.
 ## Prerequisites
 
 - A Twilio Account. [Sign up for free](https://www.twilio.com/try-twilio)
-- A [Twilio API Key and Secret](https://www.twilio.com/docs/iam/keys/api-key)
+- A [Twilio Auth Token](https://www.twilio.com/docs/iam/api/authtoken)
+- A [Registered Phone Number](https://www.twilio.com/docs/phone-numbers/regulatory/faq) 
 
 ## Usage
 
-1. Set up your credentials as secrets in your repository settings using `TWILIO_ACCOUNT_SID`, `TWILIO_API_KEY`, `TWILIO_API_SECRET`
+1. Set up your credentials as secrets in your repository settings using `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TO_PHONE_NUMBER`, `FROM_PHONE_NUMBER` 
 
 2. Add the following to your workflow
 
 ```yml
-name: Twilio Sned
+name: Twilio Send
 on:
   workflow_dispatch: # allows you to manually trigger the workflow
   schedule: # runs on a cron, nightly
     - cron: 0 0 * * * 
 env:
     TWILIO_ACCOUNT_SID: ${{ secrets.TWILIO_ACCOUNT_SID }}
-    TWILIO_API_KEY: ${{ secrets.TWILIO_API_KEY }}
+    TWILIO_AUTH_TOKEN: ${{ secrets.TWILIO_AUTH_TOKEN }}
     TWILIO_API_SECRET: ${{ secrets.TWILIO_API_SECRET }}
 permissions:
   contents: read
@@ -32,18 +33,18 @@ jobs:
       - name: 'Sending SMS Notification'
         uses: twilio-labs/actions-sms@v1
         with:
-          fromPhoneNumber: '+12345678900' # alternatively, use a Repository Secret
-          toPhoneNumber: '+12345678900' # alternatively, use a Repository Secret
+          FROM_PHONE_NUMBER: ${{ secrets.FROM_PHONE_NUMBER }} 
+          TO_PHONE_NUMBER: ${{ secrets.TO_PHONE_NUMBER }} 
           message: 'Hello from Twilio'
 ```
 
 ## Inputs
 
-### `fromPhoneNumber`
+### `FROM_PHONE_NUMBER`
 
 **Required** Phone number in your Twilio account to send the SMS from
 
-### `toPhoneNumber`
+### `TO_PHONE_NUMBER`
 
 **Required** Phone number to send the SMS to
 
@@ -55,13 +56,9 @@ jobs:
 
 A Twilio Account SID. Can alternatively be stored in environment
 
-### `TWILIO_API_KEY`
+### `TWILIO_AUTH_TOKEN`
 
-A Twilio API Key. Can alternatively be stored in environment
-
-### `TWILIO_API_SECRET`
-
-A Twilio API Secret. Can alternatively be stored in environment
+A Twilio Auth Token. Can alternatively be stored in environment
 
 ## Outputs
 
