@@ -12,10 +12,10 @@ inputs:
     description: 'The message you want to send'
     required: true
   TWILIO_ACCOUNT_SID:
-    description: 'A Twilio Account SID. Can alternatively be stored in environment'
+    description: 'A Twilio Account SID.'
     required: true
   TWILIO_AUTH_TOKEN:
-    description: 'A Twilio Auth Token. Can alternatively be stored in environment'
+    description: 'A Twilio Auth Token.'
     required: true
 outputs:
   messageSid:
