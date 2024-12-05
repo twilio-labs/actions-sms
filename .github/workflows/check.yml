@@ -1,16 +1,16 @@
+name: Test
 on:
   [pull_request]
-
-name: Check
-
 jobs:
   check:
-    name: Run Unit Tests
+    name: Run Tests
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout
-      uses: actions/checkout@v2
-    - name: Run tests
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+    - name: npm
       run: |
-        npm ci
-        npm run test
+        npm run dev
+        npm run clean
