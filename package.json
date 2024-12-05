@@ -6,10 +6,10 @@
   "scripts": {
     "build": "tsc",
     "test": "npm run build && jest",
-    "dev:install": "rm --rf node_modules && npm install",
-    "prod:install": "rm -rf node_modules && npm install --omit=dev",
-    "setup:dev": "npm run dev:install && npm run test",
-    "setup:prod": "npm run prod:install && npm run test",
+    "install:dev": "rm -rf node_modules && npm install",
+    "install:prod": "rm -rf node_modules && npm install --omit=dev",
+    "dev": "npm run install:dev && npm run test",
+    "clean": "npm run install:prod",
     "dependencyUpdate": "npx npm-check-updates -u && npm install"
   },
   "repository": {
